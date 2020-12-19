@@ -1,6 +1,6 @@
-# Beag air Bheag
+pr# Beag air Bheag Companion
 
-Beag air Bheag is a BBC radio programme designed to help students of Scottish Gàidhlig develop their language skills. Much of the material is available varioouly as downloadable podcasts and text tanscripts that can be viewed on the BBC iPlayer. The BeagairBheag Companion provides a way of "curating" this material to make access more convenient and also to provide serious students with way of adding their own notes on the material. It runs locally in a web-browser (eg Chrome) and presents all of the material for a BaB programme in a compact, accessible form. Here's a sample page:
+Beag air Bheag is a BBC radio programme designed to help students of Scottish Gàidhlig develop their language skills. Much of the material for these programmes is available variouly on BBC sites as downloadable podcasts and text rtanscripts. The Companion provides a way of "curating" this material to make access more convenient and also to provide serious students with way of adding their own notes on the material. It runs locally in a web-browser (eg Chrome) and presents all of the material for a BaB programme in a compact, accessible form. Here's a sample page:
 
 ## Principal elements
 
