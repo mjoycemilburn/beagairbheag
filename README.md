@@ -1,25 +1,25 @@
 # Beag air Bheag Companion
 
-Beag air Bheag is a BBC radio programme designed to help students of Scottish Gàidhlig develop their language skills. Much of the material for these programmes is available variouly on BBC sites as downloadable podcasts and text rtanscripts. The Companion provides a way of "curating" this material to make access more convenient and also to provide serious students with way of adding their own notes on the material. It runs locally in a web-browser (eg Chrome) and presents all of the material for a BaB programme in a compact, accessible form. Here's a sample page:
+Beag air Bheag is a long-running BBC radio programme specifically designed to help students of Scottish Gàidhlig develop their language skills. Much of the material for programme episodes is available from BBC web-pages as downloadable podcasts and text transcripts. The Companion provides a way of "curating" this material to make access more convenient and also to provide serious students with way of adding their own notes to the material. It runs locally in a web-browser such as Chrome or Firefox and presents all of the material for a selected programme episode in a compact, accessible form. Here's a sample page:
 
 ## Principal elements
 
-Signigicant Elements of the page are as follows
+Signigicant Elements of the Companion page are as follows:
 
-1. Yes, you guessed it, a toggled audio start, stop button
-2. Something new, specially designed for students - a "replay" button that rewinds the currently-selected podcast 2.5 seconds and then plays a 5 second sound-byte. You can use this repeatedly while you try to work out what is being said at ta troublesome point in a podcast
-3. Something else new. Having worked out what is being said at such a point of difficulty, you might want to create a note to remind yourself  - eg "'jay hoorshy ay' - what did he say?". Clicking this button replaces the "splash-screen" currently occupying the "activity panel" in the centre of the display with a "note-entry form allowing you to enter your note.
-4. The "noteline", When you create a note, as above, an exclamation mark will appear above the "sound-bar" at the associated point in the podcast. The note is now permanently filed in your Companion and will appear on the soundbar whenever you return to this programme. If you mouse over it, you will see the text that you entered and if you click it the 5-second sound-byte will play. Troublesome sections which have not yet been resolved can be filed as "queries" rather than notes and will display as red "question mark" symbols, rather than exclamation marks. This makes it easy to pick out outstanding issues so that you can keep cmng back to them.
+1. Yes, you guessed it, a toggled audio start, stop button that plays the audio for the selected episode. You can advance or return the play-position by clicking on the" sound-bar", draggin the "play-head" with the mouse or by using the scroll-wheel.
+2. Something new  - the Replay button, specially designed for students struggling with comprejension of a troublsoe word or phrase in a podcast - a "replay" button that rewinds the audio at the current position by 2.5 seconds and then plays a 5 second sound-byte. You can use this repeatedly while you try to work out what is being said.
+3. Something else new - the "Shriek" button. Having worked out what is being said at a point of difficulty, you might want to create a note to remind yourself what you decided when returning to the podcast at some future point. The note would typically be something brief such as   - eg "'jay hoorsht ay' - dè thuirt e - what did he say?". You enter the note text into a "note-entry form  that replaces the "splash-screen" currently occupying the "activity panel" in the centre of the display when you click the "shriek" button
+4. The "noteline", When you create a note, as above, an exclamation mark will appear above the "sound-bar" at the associated point in the podcast. The note is now permanently filed in your Companion and will appear on the soundbar whenever you return to the epside. If you mouse over it, you will see the text that you entered and if you click it the 5-second sound-byte will play. Troublesome sections which have not yet been resolved can be filed as "queries" rather than notes and will display as red "question mark" symbols, rather than exclamation marks. This makes it easy to pick out outstanding issues so that you can keep coming back to them. The penny usually drops evetually.
 5.The "texts" line. This displays, where available, transcripts for sections of a podcast. They are displayed in the context of the soundbar - ie their start and end position correspond with the associated audio. Mousing over the texts will show what they contain. Clicking on a text will display this content in the activity panel. Double-clicking on a word in a text displayed in the activity panel will launch a translation of the selected word in the current Gàidhlig on-line dictionary (AM Faclair Beag and the BBC dictionary are both supported)
 
 ## The "Fugitives"
 
-Other features of the system are hidden as "fugitive buttons" that appear as icons to the left and right of the main sound-control buttons when you mouse-over these areas of the screen. They're implemented in this was as they're relatively unimportant and so shouldn't be allowed to over-crowd the display. The most important of these are:
+Other features of the system are hidden in "fugitive buttons" that appear as icons to the left and right of the main sound-control buttons when you mouse-over these areas of the screen. They're implemented in this was as they're relatively unimportant and so shouldn't be allowed to over-crowd the display. The most important of these are:
 
 1. A "Search" button that allows you to search for texts and notes that contain a particular word
 2. A "Jotter" button that opens a simple text editor that allows you to keep a record of useful words and phrases. You could just use notepad, of course, but experience shows that it's very handy to have this facility within the body of the application.
 3. a "Translate" button that opens the Googl Gàidhlig translator. This is steadily getting quite scarily powerfule. Use cut and paste to blast troublesome transcript sections straight into Google for explication.
-4. Backup and Restore buttons to create local backup files for your notes and jotter - see "Architecture and Limitations", below
+4. Backup and Restore buttons to create local backup files for your notes and jotter - see "Architecture and Limitations", below. Backup files will appeear as (versioned) instances of a babbackup.txt file that appears in your download folder
 
 ## Architecture and Limitations
 
@@ -29,7 +29,7 @@ Another unusual feature of the the Companion is that it runs as a local html fil
 
 ## Installation
 
-Installation for casual use is extremely simple and is described on the download page at ????. Developers are welcome to inspect the code in the repository and to take cloned copies as they see fit. No instructions are provided for replicating the public system currently installed at ngatesystems.com/beagairbheag, but all the necessary constituents are available within the repository - as a developer you'll know how to use these.
+Installation for casual use is extremely simple and is described on the download page at ????. Developers are welcome to inspect the code in the repository and to take cloned copies as they see fit. No instructions are provided for replicating the public system currently installed at ngatesystems.com/beagairbheag, but all the necessary constituents are available within the repository and as a developer you'll know how to use these.
 
 
 
