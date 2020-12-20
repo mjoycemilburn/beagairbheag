@@ -31,6 +31,10 @@ Another unusual feature of the the Companion is that it runs as a local html fil
 
 Installation for casual use is extremely simple and is fully described on the download page at ????. Developers are welcome to inspect the code in the repository and to take cloned copies as they see fit. No instructions are provided for replicating the public system currently installed at ngatesystems.com/beagairbheag, but all the necessary constituents are available within the repository and as a developer you'll surely know how to use these.
 
+## Contact
+
+Use the Git Issues tab to raise programming issues. For general comments, an email to info@ngatesystems.com should produce a response
+
 
 
 
