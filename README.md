@@ -29,7 +29,7 @@ Another unusual feature of the the Companion is that it runs as a local html fil
 
 ## Installation
 
-Installation for casual use is extremely simple and is fully described on the download page at ????. Developers are welcome to inspect the code in the repository and to take cloned copies as they see fit. No instructions are provided for replicating the public system currently installed at ngatesystems.com/beagairbheag, but all the necessary constituents are available within the repository and as a developer you'll surely know how to use these.
+Installation for casual use is extremely simple and is described on the download page at https://ngatesystems.com/beagairbheag/index.html. Developers are welcome to inspect the code in the repository and to take cloned copies as they see fit. No instructions are provided for replicating the public system currently installed at ngatesystems.com/beagairbheag, but all the necessary constituents are available within the repository and as a developer you'll surely know how to use these.
 
 ## Contact
 
