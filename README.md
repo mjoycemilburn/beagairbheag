@@ -16,7 +16,7 @@ Significant Elements of the Companion page for a typical episode are as follows:
 
 Other features of the system are hidden in "fugitive buttons" that appear as icons to the left and right of the main sound-control buttons when you mouse-over these areas of the screen. They're implemented in this was as they will be used relatively infrquently and it was felt that they shouldn't be allowed to over-crowd the display. The most important of these fugitive functions are:
 
-1. A "Search" button that allows you to search for texts and notes that contain a particular word
+1. A "Search" button that allows you to search for texts and notes that contain a particular text string. Use ctrl-F to search your Jotter.
 2. A "Jotter" button that opens a simple text editor to maintain a record of useful words and phrases. You could just use WIndows Notepad or similar, of course, but experience shows that it's very handy to have this facility within the body of the application.
 3. a "Translate" button that opens Google's Gàidhlig translator. This is steadily getting quite scarily powerfule. Use cut and paste to blast troublesome transcript sections straight into Google for explication.
 4. Backup and Restore buttons that allow you to create local backup files for your notes and jotter - see "Architecture and Limitations", below. Backup files will appeear as (versioned) instances of a babbackup.txt file that appears in your download folder when you click the Backup button.
