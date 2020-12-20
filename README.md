@@ -35,7 +35,3 @@ Installation for casual use is extremely simple and is described on the download
 
 Use the Git Issues tab to raise programming issues. For general comments, an email to info@ngatesystems.com should produce a response
 
-
-
-
-- 
