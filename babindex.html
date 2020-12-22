@@ -1,0 +1,2062 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description"
+        content="BeagAirBheag study toolkit: Player, Transcript viewer, Dictionary Links, Note faciity, Crib sheets" />
+    <meta name="keywords" content="beagairbheag" />
+
+    <!-- indexedDb promises-version from https://github.com/jakearchibald/idb-->
+    <script src="https://unpkg.com/idb@5/build/iife/index-min.js"></script>
+
+    <title>BeagAirBheag Companion</title>
+
+    <style>
+        .fugitivebutton {
+            height: 4vw;
+            width: 4vw;
+            margin: 2vw 1vw 2vw 1vw;
+        }
+
+        .audiobutton {
+            height: 4vw;
+            width: 4vw;
+            border: none;
+            background-size: 50% 50%;
+            background-color: white;
+            background-repeat: no-repeat;
+            background-position: center;
+            outline: none;
+        }
+
+        .notemark {
+            max-height: 3vh;
+            background: white 0.0;
+        }
+
+        .splashscreen {
+            max-width: 100%;
+            max-height: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+            cursor: pointer;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!--HTML5 audio-->
+    <audio id="music" type="audio/mpeg">
+    </audio>
+
+    <div style="display: flex; flex-direction: column;">
+
+        <!--############  Page header - Fugitive buttons and Player Controls  ############# -->
+
+        <div id="pageheader" style="display: flex;height: 100%;justify-content: space-between; text-align: center;">
+
+            <!--    The controls are displayed centred between balancing banks of "fugitive" buttons. The idea is to avoid 
+                    cluttering the page- the buttons are only displayed when the mouse moves over them. The images are
+                    placed in permanent containers as mouseover does not work when a container is hidden
+                -->
+            <div id='buttondiv1' style="opacity:1;" onmouseover="displayButtonDiv('buttondiv1');"
+                onmouseout="fadeButtonDiv('buttondiv1');">
+                <img class="fugitivebutton" src="https://ngatesystems.com/beagairbheag/img/txtsearch.svg"
+                    title="Click to Search BaB texts and Notes" onclick="setActivityPanelToElement('textsearchpanel');">
+                <img class="fugitivebutton" src="https://ngatesystems.com/beagairbheag/img/jtrlaunch.svg"
+                    title="Click to open your Jotter" onclick="displayJotter();">
+                <img class="fugitivebutton" src="https://ngatesystems.com/beagairbheag/img/ggllaunch.svg"
+                    title="Click to open the Google Translator"
+                    onclick="displayPopupWindow('https://translate.google.com/?sl=gd&tl=enL');">
+            </div>
+
+            <div style="height:4vw; margin: 2vw;  border-style: solid;border-width: thin;">
+                <div style="display: inline-flex; justify-content: center;  align-items: center;">
+                    <div>
+                        <button id="pbutton" class="audiobutton"
+                            style="background-image: url('https://ngatesystems.com/beagairbheag/img/play.png');"
+                            onclick="toggleAudio();" ; title="Start or stop the audio-player" type="button"></button>
+                        <button class="audiobutton"
+                            style="background-image: url('https://ngatesystems.com/beagairbheag/img/rplay.png');"
+                            onclick="rewindAudio();"
+                            title="D&egrave; thuirt e? - Rewind the audio-player 5 seconds and restart (alternatively use scroll wheel over playhead)"
+                            type="button"></button>
+                        <button class="audiobutton"
+                            style="background-image: url('https://ngatesystems.com/beagairbheag/img/shriek.png');"
+                            title="Create a note"
+                            onclick="pauseAudio(); postTime=music.currentTime; setActivityPanelToElement('insertnotepanel'); document.getElementById('cnotetext').focus();"
+                            type="button"></button>
+                    </div>
+                    <div style="padding: 0 2vw 0 1vw;">
+                        <span id="currtime">00:00:00</span>/
+                        <span id="finishtime"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div id='buttondiv2' style="opacity:1;" onmouseover="displayButtonDiv('buttondiv2');"
+                onmouseout="fadeButtonDiv('buttondiv2');">
+                <img class="fugitivebutton" src="https://ngatesystems.com/beagairbheag/img/backup.svg?"
+                    title="Copy your jotter and notes to local storage" onclick="backupDataStores();">
+                <img class="fugitivebutton" src="https://ngatesystems.com/beagairbheag/img/restore.svg?"
+                    title="Restore your jotter and notes from local backup filesf" onclick="uploadBackupFile();">
+                <img class="fugitivebutton" src="https://ngatesystems.com/beagairbheag/img/mark.svg?"
+                    title="Click for Colin Mark Translations Workshops" onclick="displayColinMarkWindow();">
+            </div>
+        </div>
+
+        <!-- ############  Audio Header - Note line, Play line and Text line ############# -->
+
+        <div id="audioheader" style="
+                    width: 95%; 
+                    padding-left: .25vw;
+                    padding-right: .25vw; 
+                    margin: auto; 
+                    margin-bottom: 4vh;
+                    border: solid;">
+
+            <!-- Display an empty noteline - we'll fill this in dynamically later-->
+            <div id="noteline" style="height: 3vh; margin-top: .5vh;">
+                <a id="nsample" style="position:absolute; margin-left: 0px;">
+                    <img class="notemark" src="https://ngatesystems.com/beagairbheag/img/notemarkblack.png"></a>
+                <div id="notes"></div>
+            </div>
+
+            <!-- Now the soundbar  - ditto, but with the playhead already seeded within it -->
+
+            <div id="playline" style="
+                    width: 100%;
+                    background: rgba(0,0,0,.3);
+                    margin-top: 2px;
+                    margin-bottom: 2px;
+                    border-radius: 15px;">
+                <div id="playhead" style="
+                        cursor: pointer;
+                        width: 4vh;
+                        height: 4vh;
+                        border-radius: 50%;
+                        margin-top: 1px;
+                        background: black;"></div>
+            </div>
+
+            <!-- And finally Text bar. Due to border-collapse this is the only way I could find to get
+                 a tiny gap between the playline and the text links below it -->
+            <div id="textline" style="height: 4vh; margin-top: .25vh; margin-bottom: .25vh;">
+            </div>
+        </div>
+        <!-- ############  Panel Header - Logo panel, Activity panel and Episode panel ############# -->
+
+        <!-- flex-grow is used here to allow the children divs of the panel header to occupy
+                     the remaining spae on the page without defininf height exlicitly -->
+
+        <div id="panelheader" style="
+                    display:flex; 
+                    flex-grow: 1; 
+                    flex-shrink: 1; 
+                    flex-basis: auto;">
+
+            <!-- First of all, the "Beag air Bheag" Logo panel, the leftmost of the three display panels-->
+
+            <div id="logopanel" style="
+                    width: 25%; 
+                    margin: 3vw;
+                    overflow: auto;">
+
+                <div id="logoandbuttons">
+                    <img id="logo" style="max-width:100%;" src="https://ngatesystems.com/beagairbheag/img/logo.png"
+                        alt="Beag Air Bheag Companion logo">
+                    <p></p>
+                    <div style="margin-top: 10px;">
+                        <button onclick="setActivityPanelToString(about);" type="button"
+                            title="About the Companion">About
+                        </button>&nbsp;&nbsp;&nbsp;
+                        <button onclick="setActivityPanelToString(hints);" type="button"
+                            title="Click for Hints">Hints
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Now the multi-function activity panel-->
+
+            <div id="activitypanel" style="
+                    width: 50%;
+                    flex-grow: 1; 
+                    flex-shrink: 1; 
+                    flex-basis: auto; 
+                    margin-left: 3vw;
+                    margin-right: 3vw;
+                    padding: 1vw;
+                    border: solid black;
+                    overflow-y: auto;
+                    height: 53vh;">
+            </div>
+
+            <!-- And finally, the "Episode" panel  the rightmost of the three display panels-->
+
+            <div id="episodepanel" style="
+                    width: 25%; 
+                    margin-right: 3vw; 
+                    overflow: auto;">
+
+                <p><strong>
+                        Now Playing : Series <span id="seriesnum"></span> : <span id="episodenam"></strong>
+                </p>
+                <p>First broadcast : <span id="firstondate"></p>
+                <p>Learner of the Week : <span id="learneroftheweek"></p>
+                <p><strong>Want a different programme? </strong></p>
+                <p>Series <span id="seriespicklistcontainer"></span> : <span id="episodepicklistcontainer"></span></p>
+                <br>
+                <p>Current dictionary : <button id="dictionarypref" title="Toggle text look-up dictionary"
+                        onclick="toggleDictionaryPref()"></button></p>
+                <p id="currentsplashscreen">Current splash-screen:<br>
+                    <i id='splashscreentitle' style="margin-left:1vw; display: block;"></i></p>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- hidden jotterdiv panel displayed as fixed-size "popup"  -->
+
+    <div id="jotterdiv" style="
+                display: none; width: 80vw; height: 75vh;
+                position: absolute; margin-left: auto; margin-right: auto; left: 0; right: 0; top: 20px; 
+                padding: 3vh 2vw 2vh 2vw; border: 1px solid black; 
+                background: white;
+                z-index: 10;" onclick="event.stopPropagation();">
+        <form enctype="multipart/form-data" method="post" name="jotterform" style="width: 100%; height:90%;">
+            <input type="text" name="action" hidden value="U">
+
+            <textarea id="userjotter" name="user_jotter"
+                style="width:100%; height: 100%; font-size: larger; background:paleturquoise;"
+                onkeydown="keyPresedOnJotter(event);" spellcheck="false"></textarea>
+        </form>
+
+        <p><button id="jottersavebutton" style="padding: .25rem;" type="button" onclick="saveJotter();">Save</button>
+            <span id="savemessage" style="margin-left: 3vw; opacity: 0.5;"></span>
+        </p>
+    </div>
+
+    <!-- hidden zoomdiv panel displayed as fixed-size "popup"  -->
+
+    <div id="zoomdiv" style="
+                        display: none; width: 80vw; height: 75vh;
+                        position: absolute; margin-left: auto; margin-right: auto; left: 0; right: 0; top: 20px; 
+                        padding: 1vh 2vw 1vh 2vw; border: 1px solid black; 
+                        background: white;
+                        text-align: center;
+                        z-index: 10;" onclick="event.stopPropagation();">
+        <img id="zoomedimage" style="height: 100%;">
+    </div>
+
+    <!-- hidden text for the 'insertnotepanel' -->
+
+    <span id='insertnotepanel' style="display: none;">
+        <div style="
+                display: flex;
+                width: 60%;
+                margin: 20px auto;
+                border-style: solid;
+                border-width: thin;
+                padding: 5px;
+                justify-content: space-around;">
+            <div><button id="lBiteButton" title="Start the sound-bite one second ealier" onclick="playBiteNudgedLeft();"
+                    type="button">Nudge L</button>
+            </div>
+            <div><button id="pBiteButton" title="Play a four-second sound-bite centred on the current time"
+                    onclick="postTime=music.currentTime; playBite();" type="button">Play</button>
+            </div>
+            <div><button id="rBiteButton" title="Start the sound-bite one second later" onclick="playBiteNudgedRight();"
+                    type="button">Nudge R</button>
+            </div>
+        </div>
+
+        <p style="text-align: center">Note/Query text</p>
+        <textarea id="cnotetext" rows="4" cols="50" style="margin: 5px auto; display: block;" name="cnotetext"
+            title="Notes on sound - eg \'jay hoorshht e\' = dè thuirt e : what did he say?"></textarea>
+
+        <div style="
+                display: flex;
+                width: 60%;
+                margin: 20px auto;
+                border-style: solid;
+                border-width: thin;
+                padding: 5px;
+                justify-content: space-around;">
+            <div><button onclick="insertNote('note')" type="button">Save as Note</button></div>
+            <div><button onclick="insertNote('query')" type="button">Save as Query</button>
+            </div>
+            <div><button onclick="setActivityPanelToString('');" type="button">Cancel</button></div>
+        </div><br>
+    </span>
+
+    <!-- hidden text for the 'editnotepanel' -->
+
+    <span id='editnotepanel' style='display: none;'>
+        <div style='margin: 20px auto; text-align: center;'>
+            <button id='enBiteButton' type='button'>Play Again</button>
+        </div>
+        <textarea id='enotetext' rows='4' cols='50' name='ecnotetext' style='margin: 5px auto; display: block;'>
+        </textarea>
+        <div style='
+                    display: flex;
+                    border-style: solid;
+                    border-width: thin;
+                    margin:  20px auto;
+                    width: 15%;
+                    padding: 5px;
+                    justify-content: center;'>
+            <button id="saveeditednotebutton" title='Save edited Note' type='button'>Save</button>
+        </div>
+        <div style='
+                    display: flex;
+                    width: 60%;
+                    margin: 20px auto;
+                    border-style: solid;
+                    border-width: thin;
+                    padding: 5px;
+                    justify-content: space-around;'>
+
+            <button id='changetoquerybutton' style='display: none;' title='Change note type to "Query"' type='button'>
+                Re-save as Query</button>
+            <button id='changetonotebutton' style='display: none;' title='Change note type to "Note"' type='button'>
+                Re-save as Note</button>
+            <button id='deletenotebutton' title='Delete Note' type='button'>Delete</button>
+            <button type='button' onclick='setActivityPanelToString("");'>Cancel</button>
+        </div>
+    </span>
+
+    <!-- hidden text for the 'textsearchpanel' -->
+
+    <div id="textsearchpanel" style="display: none; width: 25vw; padding: 2vw">
+        <p> <label>Search for:</label>&nbsp;&nbsp;
+            <input id="searchstring" type="text" name="search_words" title="Search string" autofocus size="24"
+                onKeyPress="trackSearchStringEntry(event)">
+        </p>
+        <p>
+            <button id="searchbutton" type="button" onclick="searchTextsAndNotes()">Launch
+                Search</button>&nbsp;&nbsp;&nbsp;
+        </p>
+    </div>
+
+    <!-- utilities - empty form for the XMLHTTP PHP calls, "spinner for text loads and empty anchor for backup downloads -->
+
+    <form id='dummyform'>
+    </form>
+
+    <div id="waiticon" style="position: fixed; z-index: 10; display: none">Loading...
+    </div>
+
+    <a id="backupdownloadlink" download></a>
+
+    <script>
+
+        var currentSystemVersionNumber = "1.00";
+        var latestSystemVersionNumber;
+        var cryptography; // text for these elements will be served from ccentral source
+        var about;
+        var hints;
+
+        // The Companion uses numerous centrally-served .svg, .png, .php and .html elements. Although they are
+        // centraly-served, however, changing the server copy won't necessarily mean that a Copanion user will
+        // see the changes because the browser will use cached local copies until these become "stale" - which 
+        // may take a few weeks. For php elements, the problem is side-stepped by "pre-staling" the code using
+        // headers. For html elements, we fool the browser by adding a date-time "GET" parameter (they're called
+        // so rarely that the associated inefficientcy is insignificant). The numerous graphic elements are a
+        // different story, however. On balance it seems best to leave alone - nothing is going to change that
+        // would prejudice operation of the Companion.
+
+        ///// Screen Management Scripts //////////
+
+        // Does local storage contain last programme details? - use localStorage.removeItem("lastSeriesNum") ; to clear this
+
+        if (localStorage.getItem('lastSeriesNum') === null) {
+
+            // no it doesn't - so initialise them as Series 12 Episode 1 
+
+            localStorage.setItem('lastSeriesNum', '12');
+            localStorage.setItem('lastEpisodeNam', 'Episode 1');
+            localStorage.setItem('lastEpisodeFinishTime', '5421');
+            localStorage.setItem('lastFirstOnDate', '2020/06/14');
+            localStorage.setItem('lastLearnerOfTheWeek', 'Kevin Leetion');
+            localStorage.setItem('lastBBCProgrammeUrl', 'https://www.bbc.co.uk/programmes/m000k423');
+            localStorage.setItem('lastDictionaryPref', 'BBC');
+            localStorage.setItem('lastSplashScreenFilename', 'red_book.png');
+            localStorage.setItem('lastSplashScreenTitle', '"Leabhar Dearg Chlann Mhuirich - courtey Scottish Nat Coll');
+            localStorage.setItem('lastBBCDownloadFilename', 'BeagAirBheag-20200614-Episode1');
+        }
+
+        // OK can now initialise "current" user and programme variables from
+        // stable local storage values with known initial settings
+
+        var currentSeriesNum = localStorage.getItem('lastSeriesNum');
+        var currentEpisodeNam = localStorage.getItem('lastEpisodeNam');
+        var currentEpisodeFinishTime = localStorage.getItem('lastEpisodeFinishTime'); // mmss
+        var currentFirstOnDate = localStorage.getItem('lastFirstOnDate'); // formatted date (JS date-formatting is rubbish)
+        var currentLearnerOfTheWeek = localStorage.getItem('lastLearnerOfTheWeek');
+        var currentBBCProgrammeUrl = localStorage.getItem('lastBBCProgrammeUrl');
+        var currentDictionaryPref = localStorage.getItem('lastDictionaryPref');
+        var currentSplashScreenFilename = localStorage.getItem('lastSplashScreenFilename');
+        var currentSplashScreenTitle = localStorage.getItem('lastSplashScreenTitle');
+        var currentBBCDownloadFilename = localStorage.getItem('lastBBCDownloadFilename');
+
+        var playWidth;
+        var headWidth;
+        var noteWidth;
+
+        var duration;
+
+        var textTypesData; // global array of text-type data
+
+        // define startupSplashScreen
+
+        var startupSplashScreenContent = " \
+        <p style='text-align: center;'> \
+            <strong>Gàidhlig and Cryptography</strong><br><br> \
+            The entertaining and thought-provoking novels of Neal Stephenson make frequent reference to the isles of \
+            Qwhglm (pronounced 'Taghum', with stress on the second syllable), mythically located off the west coast \
+            of Scotland. The inhabitants, naturally, speak Qwghlmian, an impenetrable language employing just 16 \
+            consonant and no vowels. Qwghlmian is thus ideally suited to cryptographic applications. Hmm. Very funny, \
+            I'm sure. \
+        </p>";
+        var startupSplashScreenTitle = "Qwghlmian";
+
+        var activitypanel = document.getElementById("activitypanel");
+
+        window.onload = function () {
+
+            // get latest system version number
+
+            var form1 = document.forms.namedItem("dummyform");
+            var oData1 = new FormData(form1);
+            oData1.append("helper_type", "get_system_data");
+            var oReq1 = new XMLHttpRequest();
+            oReq1.open("POST", "https://ngatesystems.com/beagairbheag/php/player_helpers.php", true);
+            oReq1.onload = function (oEvent) {
+                if (oReq1.status == 200) {
+
+                    var response = oReq1.responseText;
+                    if (response.indexOf("%failed%") != -1) {
+                        alert(response);
+                    } else {
+
+                        var xmlDoc = oReq1.responseXML;
+                        var JSONString = xmlDoc.getElementsByTagName("returns")[0].childNodes[0].nodeValue;
+                        var JSONObject = JSON.parse(JSONString);
+
+                        latestSystemVersionNumber = JSONObject.versionnumber;
+                        cryptography = JSONObject.cryptography;
+                        about = JSONObject.about;
+                        hints = JSONObject.hints;
+
+
+                        var aboutHeader = "<p style = 'text-align: center; color:blue;''>\
+                        You are currently using version v" + currentSystemVersionNumber + " of the Companion.";
+
+                        if (latestSystemVersionNumber > currentSystemVersionNumber) {
+                            var dateObject = new Date();
+                            var currentTime = dateObject.getTime();
+                            aboutHeader += "The latest version is v" + latestSystemVersionNumber + ". Click \
+                            <a href = 'https://ngatesystems.com/beagairbheag/index.html?ver=" + currentTime + "' >here</a> if you would like to upgrade";
+                        } else {
+                            aboutHeader += "This is the latest version of the Companion.";
+                        }
+
+                        about = aboutHeader + "</p>" + about;
+
+                    }
+                }
+            };
+
+            oReq1.send(oData1);
+
+            // launch initialisation of textTypesData (header info) and while this is going on
+            // crack on with the initialisation of the screen (don't need actually need headers
+            // until we do text searches)
+
+            var form2 = document.forms.namedItem("dummyform");
+            var oData2 = new FormData(form2);
+            oData2.append("helper_type", "get_text_types_data");
+            var oReq2 = new XMLHttpRequest();
+            oReq2.open("POST", "https://ngatesystems.com/beagairbheag/php/player_helpers.php", true);
+            oReq2.onload = function (oEvent) {
+                if (oReq2.status == 200) {
+
+                    var response = oReq2.responseText;
+                    if (response.indexOf("%failed%") != -1) {
+                        alert(response);
+                    } else {
+
+                        var xmlDoc = oReq2.responseXML;
+                        var JSONString = xmlDoc.getElementsByTagName("returns")[0].childNodes[0].nodeValue;
+                        textTypesData = JSON.parse(JSONString);
+
+                    }
+                }
+            };
+
+            oReq2.send(oData2);
+
+            // make sure we've got an indexedDB database with all the necessary datastores
+
+            initialiseIndexedDBStores();
+
+            // fade the fugitive buttons by triggering a transition
+            fadeButtonDiv('buttondiv1');
+            fadeButtonDiv('buttondiv2');
+
+            buildScreenForCurrentEpisode();
+
+            if (currentSeriesNum != '') music.src = currentBBCDownloadFilename + ".mp3";
+            music.currentTime = 0;
+        }
+
+        async function initialiseIndexedDBStores() {
+            const db = await idb.openDB('BaB', 1, {
+                // the following code is only activated if the database
+                // has never been opened before
+                upgrade(db) {
+
+                    // Create a "notes" store for noteObjects
+                    const notesStore = db.createObjectStore('notes', {
+                        // The 'textkey' property of the textObject will be the key.
+                        keyPath: 'notekey',
+                    });
+                    // Create an index on the 'notekey' property of noteObjects.
+                    notesStore.createIndex('notes_by_key_path', 'notekey');
+                    // Create a secondary non-unique index on the 'noteprogrammekey' property of noteObjects.
+                    notesStore.createIndex('notes_by_programme_path', 'noteprogrammekey', { unique: false });
+
+                    // Create a "texts" store for textObjects
+                    const textsStore = db.createObjectStore('texts', {
+                        // The 'textkey' property of the textObject will be the key.
+                        keyPath: 'textkey',
+                    });
+                    // Create an index on the 'textkey' property of the textObjects.
+                    textsStore.createIndex('texts_by_key_path', 'textkey');
+
+                    // Create a "jotter" store forthe jotterObject
+                    const jotterStore = db.createObjectStore('jotter', {
+                        // The 'jotterkey' property of the jotterObject will be the key.
+                        keyPath: 'jotterkey',
+                    });
+                    // Create an index on the 'jotterkey' property of the jotterObjects.
+                    jotterStore.createIndex('jotter_by_key_path', 'jotterkey');
+
+                },
+            });
+
+            // put an initial empty jotter record into the jotter store for key
+            // 'user' if this doesn't already exist
+
+            {
+                const tx = db.transaction('jotter', 'readwrite');
+                var jotterObject = { 'jotterkey': 'user', 'jotter': '' };
+                try {
+                    await Promise.all([
+                        tx.store.add(jotterObject), // only a single store in play, so "store" references this automatically
+                        tx.done,
+                    ]);
+                } catch (e) {
+                    const recordAlreadyExists = 'Key already exists in the object store.';
+                    if (e.toString().indexOf(recordAlreadyExists) != -1) {
+                        return;
+                    } else {
+                        console.error(e);
+                    }
+                }
+            }
+        }
+
+        var audioExceptionMessageJustDisplayed = false;
+
+        function buildScreenForCurrentEpisode() {
+
+            // display the splashscreen for this instance of the Companion
+
+            // choose a splashscreen (use localStorage.removeItem('firstuseofbab'); to test
+
+            if (localStorage.getItem('firstuseofbab') === null) {
+                setActivityPanelToString(startupSplashScreenContent);
+                document.getElementById('splashscreentitle').innerHTML = startupSplashScreenTitle;
+                document.getElementById('currentsplashscreen').style.display = "block";
+                localStorage.setItem('firstuseofbab', 1);
+            } else {
+                setActivityPanelToString('<img class="splashscreen" onclick="zoomSplashScreen(); event.stopPropagation();" src="https://ngatesystems.com/beagairbheag/splashscreens/' + currentSplashScreenFilename + '">');
+                document.getElementById('splashscreentitle').innerHTML = currentSplashScreenTitle;
+                document.getElementById('currentsplashscreen').style.display = "block";
+            }
+
+            duration = timeToSeconds(currentEpisodeFinishTime);
+
+            if (currentSeriesNum != '') {
+                document.getElementById('finishtime').innerHTML = formatTime(duration);
+                document.getElementById('seriesnum').innerHTML = currentSeriesNum;
+                document.getElementById('episodenam').innerHTML = currentEpisodeNam;
+                document.getElementById('firstondate').innerHTML = currentFirstOnDate;
+                document.getElementById('learneroftheweek').innerHTML = currentLearnerOfTheWeek;
+                document.getElementById("dictionarypref").textContent = currentDictionaryPref;
+            } else {
+                document.getElementById('finishtime').innerHTML = "undefined";
+                document.getElementById('seriesnum').innerHTML = "undefined";
+                document.getElementById('episodenam').innerHTML = "undefined";
+                document.getElementById('firstondate').innerHTML = "undefined";
+                document.getElementById('learneroftheweek').innerHTML = "undefined";
+                document.getElementById("dictionarypref").textContent = currentDictionaryPref;
+            }
+
+            buildProgrammePicklists(currentSeriesNum, currentEpisodeNam);
+
+            // get the pixel widths of the playline and playhead - these are key parameter
+            // used throughout the rest of the layout, determining the absolute position of
+            // notes, playhead and texts in the audioheader
+            // Also use the sample note mark to get the scaled width of the notemark image - 
+            // this is used to position the centre of the mark precisely
+
+            playWidth = document.getElementById('playline').offsetWidth;
+            headWidth = document.getElementById('playhead').offsetWidth;
+            noteWidth = document.getElementById('nsample').offsetWidth;
+
+            // We calculate the left margin of a note img at time t seconds as :
+            // (0.5 * headWidth) + (t * (playWidth- headWidth) / duration) - (0.5* noteWidth)
+            // or t*scaleFactor + scaleCorrectionForNote
+
+            var scaleFactor = (playWidth - headWidth) / duration;
+            var scaleCorrectionForNote = (0.5 * headWidth) - (0.5 * noteWidth);
+
+            buildNoteline(currentSeriesNum, currentEpisodeNam, scaleFactor, scaleCorrectionForNote);
+
+            // We calculate the left margin of a text img at time t seconds as :
+            // (0.5 * headWidth) + (t * (playWidth - headWidth) / duration)
+            // or t*scaleFactor + scaleCorrectionForText
+            // We calculate the length of a text as rightMargin - leftMargin
+
+            var scaleCorrectionForText = (0.5 * headWidth);
+
+            buildTextsline(currentSeriesNum, currentEpisodeNam, scaleFactor, scaleCorrectionForText);
+
+            // add an event listener for the 'music' audio tag. The "true" value in the third
+            // parameter means the event is captured in the capturing phase
+
+            music.addEventListener('error', function (e) {
+                var noSourcesLoaded = (this.networkState === HTMLMediaElement.NETWORK_NO_SOURCE);
+                if (noSourcesLoaded) {
+                    var alertMessage =
+                        "<div style = 'text-align: center;'>" +
+                        "Oops - can't find your download file at : <br><br>" +
+                        "<div style = 'color: red; overflow-y: auto;'>" + music.src +
+                        "</div>" +
+                        "<br><br>You need to download this from the BBC " +
+                        "<a href = '" + currentBBCProgrammeUrl + "' target='_blank'>Programme Page</a>" +
+                        " for this episode, wait for the episode to appear in your download" +
+                        " folder and then move it to the folder where you saved your" +
+                        " babindex.html file. If you are trying the Companion for the first time" +
+                        " this will probably still be your download folder, of course, in which" +
+                        " case, just click the 'Play' button again, now, and sit back and enjoy the programme" +
+                        "</div>";
+                    setActivityPanelToString(alertMessage);
+                    audioExceptionMessageJustDisplayed = true;
+                }
+            }, true);
+
+        }
+
+        function toggleDictionaryPref() {
+
+            if (currentDictionaryPref == "BBC") {
+                currentDictionaryPref = "AFB";
+            } else {
+                currentDictionaryPref = "BBC";
+            }
+            document.getElementById("dictionarypref").textContent = currentDictionaryPref;
+
+            //set local storage
+
+            localStorage.setItem('lastDictionaryPref', currentDictionaryPref);
+        }
+
+        function buildProgrammePicklists(seriesNum, episodeNam) {
+
+            var form = document.forms.namedItem("dummyform");
+            var oData = new FormData(form);
+            oData.append("helper_type", "build_programme_picklists");
+            oData.append("series_num", seriesNum);
+            oData.append("episode_nam", episodeNam);
+            var oReq = new XMLHttpRequest();
+            oReq.open("POST", "https://ngatesystems.com/beagairbheag/php/player_helpers.php", true);
+            oReq.onload = function (oEvent) {
+                if (oReq.status == 200) {
+
+                    var response = oReq.responseText;
+                    if (response.indexOf("%failed%") != -1) {
+                        alert(response);
+                    } else {
+                        var xmlDoc = oReq.responseXML;
+                        var JSONString = xmlDoc.getElementsByTagName("returns")[0].childNodes[0].nodeValue;
+                        var JSONObject = JSON.parse(JSONString);
+
+                        seriesPicklist = JSONObject.seriespicklist;
+                        episodePicklist = JSONObject.episodepicklist;
+
+                        document.getElementById('seriespicklistcontainer').innerHTML = seriesPicklist;
+                        document.getElementById('episodepicklistcontainer').innerHTML = episodePicklist;
+                    }
+                }
+            };
+            oReq.send(oData);
+        }
+
+        async function buildNoteline(seriesNum, episodeNam, scaleFactor, scaleCorrectionForNote) {
+
+            const db = await idb.openDB('BaB', 1);
+            const tx = db.transaction('notes', 'readwrite');
+
+            // Get the contents of "notes", for series seriesNum and episode episodeNam
+            var noteProgrammeKey = currentSeriesNum + "%" + currentEpisodeNam;
+            const noteObjects = await db.getAllFromIndex('notes', 'notes_by_programme_path', noteProgrammeKey);
+
+            if (noteObjects != undefined) {
+
+                for (var i = 0; i < noteObjects.length; i++) {
+
+                    var noteKey = noteObjects[i].notekey;
+                    var noteKeyElements = noteKey.split("%");
+                    var secondsIntoProgramme = noteKeyElements[2];
+
+                    var noteText = noteObjects[i].notetext;
+                    var noteType = noteObjects[i].notetype;
+
+                    var marginLeft = (secondsIntoProgramme * scaleFactor) + scaleCorrectionForNote;
+                    var noteTextStub = noteText.substring(0, 15) + ' ...';
+
+                    document.getElementById('notes').innerHTML += "\
+                <a id='n" + secondsIntoProgramme + "'\
+                    style='position:absolute; margin-left: " + marginLeft + "px; cursor: pointer;' \
+                    title='" + noteTextStub + "'\
+                    onclick = 'displayEditNotePanel(\"n" + secondsIntoProgramme + "\");'>\
+                    <img class='notemark' src='https://ngatesystems.com/beagairbheag/img/notemarkblack.png'>\
+                </a>";
+                }
+            }
+        }
+
+        function buildTextsline(seriesNum, episodeNam, scaleFactor, scaleCorrectionForText) {
+
+            var form = document.forms.namedItem("dummyform");
+            var oData = new FormData(form);
+            oData.append("helper_type", "build_textline");
+            oData.append("series_num", seriesNum);
+            oData.append("episode_nam", episodeNam);
+            oData.append("scale_factor", scaleFactor);
+            oData.append("scale_correction_for_text", scaleCorrectionForText);
+            var oReq = new XMLHttpRequest();
+            oReq.open("POST", "https://ngatesystems.com/beagairbheag/php/player_helpers.php", true);
+            oReq.onload = function (oEvent) {
+                if (oReq.status == 200) {
+
+                    var response = oReq.responseText;
+                    if (response.indexOf("%failed%") != -1) {
+                        alert(response);
+                    } else {
+                        document.getElementById('textline').innerHTML = response;
+                    }
+                }
+            };
+            oReq.send(oData);
+        }
+
+        async function insertNote(noteType) {
+
+            // insert a note of the given type for the current series and episode into the notes datastore
+
+            var newnote = document.getElementById("n" + postTime);
+
+            if (typeof (newnote) === 'undefined' || typeof (newnote) === null) {
+                alert('Oops - there is already a note at this location!');
+                return;
+            }
+
+            var noteText = document.getElementById('cnotetext').value;
+            var postTimeAsInteger = Math.floor(postTime);
+
+            // noteKey is constructed from the following four components: 
+            // **  seriesNum, episodeNam, secondsIntoProgramme separated by % symbols **
+            // thus, for, eg 4%Episde 3%1805
+
+            var noteKey = currentSeriesNum + "%" + currentEpisodeNam + "%" + postTimeAsInteger;
+            var noteProgrammeKey = currentSeriesNum + "%" + currentEpisodeNam;
+            var noteObject = { 'notekey': noteKey, 'noteprogrammekey': noteProgrammeKey, 'notetext': sanitizeText(noteText), 'notetype': noteType };
+
+            // Add the note in a transaction so we can check everything works
+            const db = await idb.openDB('BaB', 1);
+            {
+                const tx = db.transaction('notes', 'readwrite');
+
+                try {
+                    await Promise.all([
+                        tx.store.put(noteObject), // only a single store in play, so "store" references this automatically
+                    ]);
+                } catch (e) {
+                    alert(e);
+                }
+            }
+
+            // add the note to the noteline - rather tedious as you have to build "the new child
+            // first as an empty <a> element, declare its innerhtml and then add its properties
+
+            if (noteType === "note") {
+                var noteInnerHTML = "<img class='notemark' src='https://ngatesystems.com/beagairbheag/img/notemarkblack.png'></a>";
+            } else {
+                var noteInnerHTML = "<img class='notemark' src='https://ngatesystems.com/beagairbheag/img/notemarkred.png'></a>";
+            }
+
+            var newNote = document.createElement("a");  // create a new <a> element
+            newNote.innerHTML = noteInnerHTML; // add some html to it
+
+            // now add properties to the <a> element as well
+
+            newNote.setAttribute("id", "n" + postTimeAsInteger);
+            newNote.setAttribute("title", noteText.substring(0, 15));
+
+            var marginLeft = (0.5 * headWidth) + (postTimeAsInteger * (playWidth - headWidth) / duration) - (0.5 * noteWidth);
+            newNote.setAttribute("style", "position: absolute; margin-left: " + marginLeft + "px");
+
+            var onclickLink = "displayEditNotePanel('n" + postTimeAsInteger + "')";
+            newNote.setAttribute("onclick", onclickLink);
+
+            // and finally, add the new <a> element into the DOM as a child of the 'textline' div
+
+            document.getElementById('noteline').appendChild(newNote);
+
+            // display an "OK" message in activitypanel
+
+            var message = "<p style='margin-top:3vh; text-align: center; color: blue'><span>Note saved</span></p>";
+            setActivityPanelToString(message);
+
+        }
+
+        async function displayEditNotePanel(noteId) {
+
+            var secondsIntoProgramme = noteId.substring(1);
+
+            // retrieve the note from notestore
+
+            const db = await idb.openDB('BaB', 1);
+
+            var noteKey = currentSeriesNum + "%" + currentEpisodeNam + "%" + secondsIntoProgramme;
+            const noteObject = await db.get('notes', noteKey);
+
+            setActivityPanelToElement('editnotepanel');
+
+            document.getElementById('enotetext').value = noteObject.notetext;
+            document.getElementById('enotetext').focus();
+
+            document.getElementById('saveeditednotebutton').onclick = function () { editNote(noteId, noteObject.notetype) };
+
+            if (noteObject.notetype === "note") {
+                document.getElementById('changetoquerybutton').style.display = 'block';
+                document.getElementById('changetoquerybutton').onclick = function () { editNote(noteId, "query") };
+            } else {
+                document.getElementById('changetonotebutton').style.display = 'block';
+                document.getElementById('changetonotebutton').onclick = function () { editNote(noteId, "note") };
+            }
+            document.getElementById('deletenotebutton').onclick = function () { deleteNote(noteId) };
+
+        }
+
+        async function editNote(noteId, noteType) {
+
+            // replace the text and type of the note at noteId for the current 
+            // series and episode in the notes datastore
+
+            var noteText = sanitizeText(document.getElementById('enotetext').value)
+            var secondsIntoProgramme = noteId.substring(1);
+
+            var noteKey = currentSeriesNum + "%" + currentEpisodeNam + "%" + secondsIntoProgramme;
+            var noteProgrammeKey = currentSeriesNum + "%" + currentEpisodeNam;
+            var noteObject = { 'notekey': noteKey, 'noteprogrammekey': noteProgrammeKey, 'notetext': noteText, 'notetype': noteType };
+
+            // Add the note in a transaction so we can check everything works
+            const db = await idb.openDB('BaB', 1);
+            {
+                const tx = db.transaction('notes', 'readwrite');
+
+                try {
+                    await Promise.all([
+                        tx.store.put(noteObject), // only a single store in play, so "store" references this automatically
+                    ]);
+                } catch (e) {
+                    alert(e);
+                }
+            }
+
+            // set the note icon note_type in case it has changed
+
+            if (noteType === "note") {
+                document.getElementById(noteId).innerHTML = "<img class='notemark' src='https://ngatesystems.com/beagairbheag/img/notemarkblack.png'>";
+            } else {
+                document.getElementById(noteId).innerHTML = "<img class='notemark' src='https://ngatesystems.com/beagairbheag/img/notemarkred.png'>";
+            }
+
+            // ditto the title
+
+            var noteTextStub = document.getElementById('enotetext').value.substr(0.15) + " ...";
+            document.getElementById(noteId).title = noteTextStub;
+
+            document.getElementById('deletenotebutton').onclick = function () { deleteNote(noteId) };
+
+        }
+
+        async function deleteNote(noteId) {
+
+            var secondsIntoProgramme = noteId.substring(1);
+            var noteKey = currentSeriesNum + "%" + currentEpisodeNam + "%" + secondsIntoProgramme;
+
+            // Delete the note in a transaction so we can check everything works
+            const db = await idb.openDB('BaB', 1);
+            {
+                const tx = db.transaction('notes', 'readwrite');
+
+                try {
+                    await Promise.all([
+                        tx.store.delete(noteKey), // only a single store in play, so "store" references this automatically
+                    ]);
+                } catch (e) {
+                    alert(e);
+                }
+            }
+
+            var noteelement = document.getElementById("n" + secondsIntoProgramme);
+            noteelement.remove();
+
+            // display an "OK" message in activitypanel
+
+            var message = "<p style='margin-top:3vh; text-align: center; color: blue'><span>Note removed</span></p>";
+            setActivityPanelToString(message);
+        }
+
+        var transcriptSource;
+        async function displayTextSource(textKey, textUrl, textHeader, searchString) {
+
+            // display the text for textSource, first retrieving this, if necessary, from the BBC page
+            // for the text-type. Where the display request has come from the search panel, highlight
+            // the searchWord occurrentces in the text
+
+            // textKey is constructed from the following four components: 
+            // **  seriesNum, episodeNam, textType, textTitle separated by % symbols **
+            // thus, for, eg 4%Episde 3%tarscriobh$Pàirc Hampden
+
+            var textKeyElements = textKey.split("%");
+            var seriesNum = textKeyElements[0];
+            var episodeNam = textKeyElements[1];
+            var textType = textKeyElements[2];
+            var textTitle = textKeyElements[3];
+
+            var textDataForTextType = textTypesData.filter(function (e) {
+                return (e.texttype == textType)
+            });
+
+            var textHeading = textHeader + " : " + textTitle;
+
+            const db = await idb.openDB('BaB', 1);
+
+            // Try to retrieve the text for the given key
+            {
+
+                transcriptSource = await db.get('texts', textKey);
+            }
+
+            if (transcriptSource == undefined) {
+
+                showWaitIcon();
+
+                var form = document.forms.namedItem("dummyform");
+                var oData = new FormData(form);
+                oData.append("helper_type", "get_transcript_source");
+                oData.append("url", textUrl);
+                var oReq = new XMLHttpRequest();
+                oReq.open("POST", "https://ngatesystems.com/beagairbheag/php/player_helpers.php", true);
+                oReq.onload = function (oEvent) {
+                    if (oReq.status == 200) {
+
+                        var response = oReq.responseText;
+                        if (response.indexOf("%failed%") != -1) {
+                            alert(response);
+                        } else {
+
+                            // extracting the text with javascript is surprisingly quick - php
+                            // turned it to be effectively slowere because it didn't benefit from
+                            // local caching of the bbc web-page
+
+                            transcriptSource = autoEditText(response);
+                            hideWaitIcon();
+
+                            setActivityPanelToString("<strong>" + textHeading + "</strong>" + transcriptSource);
+                            activitypanel.ondblclick = amFaclairBeagSearch; // add double click to drive the dictionary lookup
+
+                            // tuck a copy away in the local Texts indexedDB database for use by "search" button
+
+                            textObject = { 'textkey': textKey, "text": transcriptSource };
+                            saveTextInLocalDb(textObject);
+                        }
+                    }
+                };
+                oReq.send(oData);
+            } else {
+
+                // if searchString is defined, highlight occurrences in retrievedText. This is slightly tedious as we're
+                // doing case-insensitive matches and therefore have to do case-insensitive searches in retrievedText
+                // to find the bits to be highlighted. See https://stackoverflow.com/questions/52175779/how-can-i-perform-a-case-insensitive-replace-in-javascript
+                // for the source of the following trick
+
+                if (searchString != '') {
+                    var searchRegex = new RegExp(searchString, "gi");
+                    var highlightedText = transcriptSource.text.replace(searchRegex, '<b style ="color: red;">$&</b>');
+                } else {
+                    var highlightedText = transcriptSource.text;
+                }
+
+                setActivityPanelToString("<strong>" + textHeading + "</strong>" + highlightedText);
+                activitypanel.ondblclick = amFaclairBeagSearch; // add double click to drive the dictionary lookup
+
+            }
+        }
+
+        function autoEditText(localInput) {
+
+            var localInputLength;
+            var paraStart;
+            var paraEnd;
+            var output = '';
+
+            outOfParas = false;
+            input = '';
+
+            while (!outOfParas) {
+
+                localInputLength = localInput.length;
+                // get position of first <p>
+                paraStart = localInput.indexOf("<p>");
+
+                if (paraStart == -1) {
+
+                    outOfParas = true;
+
+                } else {
+
+                    // ignore text before this point
+                    localInput = localInput.substring(paraStart, localInputLength);
+                    localInputLength = localInput.length;
+                    // get position of companion  </p>
+                    paraEnd = localInput.indexOf("</p>");
+                    // tuck away everything up to this point
+                    output = output + localInput.substring(0, paraEnd + 4);
+                    // ignore text before this point
+                    localInput = localInput.substring(paraEnd + 4, localInputLength);
+
+                }
+                // change any ʼ characters to ' - they cause 503 errors on the POST!
+                output = output.replace(/ʼ/g, "'");
+                output = output.replace(/‘/g, "'");
+
+            }
+
+            // accented letters in the BBC texts are coded as html entities - eg è will be coded
+            // as &egrave; We're using ISO codes in searches and notes, so we need to replace these
+
+            output = output.replace(/&agrave;/g, "à");
+            output = output.replace(/&egrave;/g, "è");
+            output = output.replace(/&igrave;/g, "ì");
+            output = output.replace(/&ograve;/g, "ò");
+            output = output.replace(/&ugrave;/g, "ù");
+            output = output.replace(/&igrave;/g, "ì");
+
+            return output;
+
+        }
+
+        async function saveTextInLocalDb(textObject) {
+            const db = await idb.openDB('BaB', 1);
+
+            // Add the text in a transaction so we can check if it's already there
+            {
+                const tx = db.transaction('texts', 'readwrite');
+
+                try {
+                    await Promise.all([
+                        tx.store.add(textObject), // only a single store in play, so "store" references this automaically
+                        tx.done,
+                    ]);
+                } catch (e) {
+                    const textAlreadyExists = 'Key already exists in the object store.';
+                    if (e.toString().indexOf(textAlreadyExists) != -1) {
+                        return;
+                    } else {
+                        console.error(e);
+                    }
+                }
+            }
+        }
+
+        function amFaclairBeagSearch() {
+
+            // The following ternary (see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_Operator)
+            // Finds the "value" of the selected word as:
+
+            selectedWord = (typeof (window["getSelection"]) == "undefined" ? document.getSelection() : window.getSelection().toString());
+            displayAFBSearchResults(selectedWord);
+        }
+
+        function displayAFBSearchResults(searchWord) {
+
+            if (searchWord) {
+
+                searchWord = encodeURIComponent(searchWord)
+
+                // this seemed originally to be set to target the mobile(?) version of afb - note have changed to https now from very first version of this code
+                // In March 2019 started to get "asynchronous op denied" error msg. Found that could fall back to the main version.
+                // var DictionaryWindow = window.open("https://www.faclair.com/mm/index.aspx?txtSearch=" + searchWord, "AFB", "width=500, height=600, resizable=1, menubar=no, scrollbars=1, status=1, titlebar=1, toolbar=no, location=no, personalbar=1");
+
+                if (currentDictionaryPref === "AFB") {
+                    var DictionaryWindow = window.open("https://www.faclair.com/index.aspx?txtSearch=" + searchWord, "AFB", "width=500, height=600, resizable=1, menubar=no, scrollbars=1, status=1, titlebar=1, toolbar=no, location=no, personalbar=1");
+                } else {
+                    var DictionaryWindow = window.open("https://learngaelic.scot/dictionary/index.jsp?abairt=" + searchWord + "&slang=gd&wholeword=false", "BBC", "width=500, height=600, resizable=1, menubar=no, scrollbars=1, status=1, titlebar=1, toolbar=no, location=no, personalbar=1");
+                }
+                DictionaryWindow.focus();
+            }
+        }
+
+        function changeSeries() {
+            // Series Number has been changed, redraw the picklists with the
+            // episodes for the new series and set Episode number to undefined
+
+            var seriespicklist = document.getElementById('seriespicklist');
+            currentSeriesNum = seriespicklist.options[seriespicklist.selectedIndex].value;
+
+            pauseAudio();
+
+            buildProgrammePicklists(currentSeriesNum, 'undefined');
+        }
+
+        function changeEpisode() {
+            // Episode Number has changed, redraw the picklists witht the
+            // new episode and try to change the current audio
+
+            var episodepicklist = document.getElementById('episodepicklist');
+            currentEpisodeNam = episodepicklist.options[episodepicklist.selectedIndex].value;
+
+            // get the download filename and duration etc for the newly-selected programme
+
+            var form = document.forms.namedItem("dummyform");
+            var oData = new FormData(form);
+            oData.append("helper_type", "get_programme_data");
+            oData.append("series_num", currentSeriesNum);
+            oData.append("episode_nam", currentEpisodeNam);
+            var oReq = new XMLHttpRequest();
+            oReq.open("POST", "https://ngatesystems.com/beagairbheag/php/player_helpers.php", true);
+            oReq.onload = function (oEvent) {
+                if (oReq.status == 200) {
+
+                    var response = oReq.responseText;
+                    if (response.indexOf("%failed%") != -1) {
+                        alert(response);
+                    } else {
+
+                        var xmlDoc = oReq.responseXML;
+                        var JSONString = xmlDoc.getElementsByTagName("returns")[0].childNodes[0].nodeValue;
+                        var JSONObject = JSON.parse(JSONString);
+
+                        music.src = JSONObject.audiofilename + ".mp3";
+                        pbutton.style.backgroundImage = "url('https://ngatesystems.com/beagairbheag/img/play.png')";
+                        music.currentTime = 0;
+                        music.addEventListener("timeupdate", timeUpdate);
+                        currentFirstOnDate = JSONObject.currentFirstOnDate;
+                        currentEpisodeFinishTime = JSONObject.currentEpisodeFinishTime;
+                        currentLearnerOfTheWeek = JSONObject.currentLearnerOfTheWeek;
+                        currentBBCProgrammeUrl = JSONObject.currentBBCProgrammeUrl;
+                        currentBBCDownloadFilename = JSONObject.audiofilename;
+                        currentSplashScreenFilename = JSONObject.currentSplashScreenFilename;
+                        currentSplashScreenTitle = JSONObject.currentSplashScreenTitle;
+
+                        //set local storage
+
+                        localStorage.setItem('lastSeriesNum', currentSeriesNum);
+                        localStorage.setItem('lastEpisodeNam', currentEpisodeNam);
+                        localStorage.setItem('lastFirstOnDate', currentFirstOnDate);
+                        localStorage.setItem('lastEpisodeFinishTime', currentEpisodeFinishTime);
+                        localStorage.setItem('lastLearnerOfTheWeek', currentLearnerOfTheWeek);
+                        localStorage.setItem('lastBBCProgrammeUrl', currentBBCProgrammeUrl);
+                        localStorage.setItem('lastBBCProgrammeUrl', currentBBCProgrammeUrl);
+                        localStorage.setItem('lastSplashScreenFilename', currentSplashScreenFilename);
+                        localStorage.setItem('lastSplashScreenTitle', currentSplashScreenTitle);
+
+                        buildScreenForCurrentEpisode();
+
+                    }
+                }
+            };
+            oReq.send(oData);
+        }
+
+        function displayButtonDiv(buttondivid) {
+            document.getElementById(buttondivid).style.transition = 'opacity 0s';
+            document.getElementById(buttondivid).style.opacity = 1;
+        }
+
+        function fadeButtonDiv(buttondivid) {
+            document.getElementById(buttondivid).style.transition = 'opacity 5s';
+            document.getElementById(buttondivid).style.opacity = 0;
+        }
+
+        function trackSearchStringEntry(event) {
+            if (event.keyCode == 13) {
+                return searchTextsAndNotes();
+            } else {
+                return true;
+            }
+
+        }
+
+        async function searchTextsAndNotes() {
+
+            // search the texts that have been visited (and therefore stored in the indexedDB texts
+            // datastore) for matches with searchString. ditto notes
+
+            var searchString = document.getElementById("searchstring").value;
+
+            if (searchString == '') return;
+
+            const db = await idb.openDB('BaB', 1);
+            // const tx = db.transaction('texts', 'readwrite');
+            // Get the contents of "texts" in textkey order:
+            var texts = await db.getAllFromIndex('texts', 'texts_by_key_path');
+
+            var results = '<a name="textssection"></a><a href = "#notessection" style = "font-weight: bold; color: blue;">Skip to Notes search results:</a><br><br>';
+            //var searchRegex = new RegExp(searchString, "gi");
+
+            for (var i = 0; i < texts.length; i++) {
+
+                // OK, so the texts objects are now in texts[i]. First strip any html tags as these cause huge problems when we
+                // display a portion of text and get the start of a tagged bit of text (eg a bold section) in the portion
+                // without the closing tex (or vice versa).
+
+                var strippedText = texts[i].text.replace(/<[\s\S]*?>/g, ''); // courtesy of https://stackoverflow.com/questions/5601903/jquery-almost-equivalent-of-phps-strip-tags
+
+                // now decipher the textKey
+
+                var keyElements = texts[i].textkey.split("%");
+                var seriesNum = keyElements[0];
+                var episodeNam = keyElements[1];
+                var textType = keyElements[2];
+                var textTitle = keyElements[3];
+
+                var textDataForTextType = textTypesData.filter(function (e) {
+                    return (e.texttype == textType)
+                });
+                var textHeader = textDataForTextType[0]['textheader'];
+                var searchTextHeading = "Series " + seriesNum + " : " + episodeNam + " : " + textHeader + " : " + textTitle;
+
+                // create upper-case versions of both strippedText and searchString so that we can do case-insensitive searches
+                var ucStrippedText = strippedText.toUpperCase();
+                var ucSearchString = searchString.toUpperCase();
+                var resultCount = 0;
+
+                for (var pos = ucStrippedText.indexOf(ucSearchString); pos !== -1; pos = ucStrippedText.indexOf(ucSearchString, pos + 1)) {
+
+                    resultCount++;
+                    // for every text that generates a match(whether in the title or the content) return a pair of table
+                    // rows(one each for title and text - content) that display the match centred in a block of 30 characters 
+                    // with html that will display the text itself if either of the rows is clicked
+
+                    results += "<span onclick = 'displayTextSource(\"" + texts[i].textkey + "\", \"\", \"" + textHeader + "\", \"" + searchString + "\");'>... " + searchTextHeading + " ...</span><br>"
+                    var start = Math.max(0, pos - 15);
+                    var finish = Math.min(strippedText.length, pos + 30);
+                    var textBlock = strippedText.substring(start, finish)
+
+                    // highlight the searchString string in the text block. This is slightly tedious as we'r doing
+                    // case-insensitive matches and therefore have to do another case-insensitive search in textBlock
+                    // to find the bit to be highlighted.
+
+                    var ucTextBlock = textBlock.toUpperCase();
+                    var posInTextBlock = ucTextBlock.indexOf(ucSearchString);
+
+                    var textBlockWithHighlights = textBlock.substring(0, posInTextBlock) +
+                        "<span style = 'color: red; font-weight:bold;'>" + textBlock.substring(posInTextBlock, posInTextBlock + searchString.length) + "</span>" +
+                        textBlock.substring(posInTextBlock + searchString.length, textBlock.length);
+
+                    results += "<span onclick = 'displayTextSource(\"" + texts[i].textkey + "\", \"\", \"" + textHeader + "\", \"" + searchString + "\");'>... " + textBlockWithHighlights + " ... <br><br></span>";
+
+                }
+            }
+
+            if (resultCount === '') {
+                results = "<div style=\'text-align: center;\'>Sorry - no matches found in texts</div>";
+            }
+
+            // now search notes
+
+            var searchRegex = new RegExp(searchString, "gi");
+
+            results += '<a name="notessection"></a><a href = "#textssection" style = "font-weight: bold; color: blue;">Return to Texts search results:</a><br><br>';
+
+            const noteObjects = await db.getAll('notes');
+
+            if (noteObjects != undefined) {
+
+                resultCount = 0;
+                for (var i = 0; i < noteObjects.length; i++) {
+
+                    var noteText = noteObjects[i].notetext;
+                    var ucNoteText = noteText.toUpperCase();
+
+                    var pos = ucNoteText.indexOf(ucSearchString);
+
+                    if (pos != -1) {
+
+                        resultCount++;
+                        var noteKey = noteObjects[i].notekey;
+                        var noteKeyElements = noteKey.split("%");
+
+                        results += "<span>... Series" + noteKeyElements[0] + " : " + noteKeyElements[1] + " at " + formatTime(noteKeyElements[2]) + " ...</span><br>";
+
+                        var start = Math.max(0, pos - 15);
+                        var finish = Math.min(noteText.length, pos + 30);
+                        var textBlock = noteText.substring(start, finish)
+
+
+                        var highlightedTextBlock = textBlock.replace(searchRegex, '<b style ="color: red;">$&</b>');
+                        results += "<span>... " + highlightedTextBlock + " ...</span><br><br>";
+                    }
+                }
+
+                if (resultCount === '') {
+                    results = "<div style=\'text-align: center;\'>Sorry - no matches found in texts</div>";
+                }
+            }
+
+            document.getElementById('activitypanel').innerHTML = results;
+
+        }
+
+        var userJotterChanged;
+        var isCtrl;
+        var jottersavebutton = document.getElementById('jottersavebutton');
+
+        async function displayJotter() {
+
+            // retrieve the user's jotter and reveal the jotterdiv to display it
+            // above the main display
+
+            const db = await idb.openDB('BaB', 1);
+
+            // get the jotter from the jotter store
+
+            const jotterObject = await db.get('jotter', 'user');
+
+            // reveal a popup window to display the jotter;
+
+            document.getElementById('jotterdiv').style.display = "block";
+            document.getElementById('userjotter').value = jotterObject.text;
+            document.getElementById('userjotter').placeholder = jotterObject.text;
+            document.getElementById('userjotter').focus();
+            isCtrl = false;
+            userJotterChanged = false;
+
+            // Create a temporary window.onclick function to close the popup and null itself when
+            // the use clicks outside
+
+            window.onclick = function () {
+
+                if (userJotterChanged) {
+                    if (confirm("Jotter has unsaved changes - do you want to save them?")) {
+                        saveJotter();
+                    }
+                }
+                document.getElementById('jotterdiv').style.display = "none";
+                window.onclick = null;
+            };
+
+        }
+
+        async function saveJotter() {
+            // save the user jotter
+
+            var jotterObject = { 'jotterkey': 'user', 'text': sanitizeText(document.getElementById('userjotter').value) };
+
+            // Add the jotter in a transaction so we can check everything works
+            const db = await idb.openDB('BaB', 1);
+            {
+                const tx = db.transaction('jotter', 'readwrite');
+
+                try {
+                    await Promise.all([
+                        tx.store.put(jotterObject), // only a single store in play, so "store" references this automatically
+                    ]);
+                } catch (e) {
+                    alert(e);
+                }
+            }
+
+            jottersavebutton.style.opacity = 0.5;
+            jottersavebutton.style.background = "white";
+            isCtrl = false;
+            userJotterChanged = false;
+        }
+
+        function keyPresedOnJotter(e) {
+            if (e.keyCode == 17) { //17 = ctrl
+                isCtrl = true;
+                return;
+            }
+            if (e.keyCode == 83 && isCtrl == true) { // 83 = s
+                e.preventDefault(); // suppress the browser's 'save s file' action
+                e.stopPropagation();
+                saveJotter();
+                userJotterChanged = false;
+                isCtrl = false;
+                return false;
+            }
+            userJotterChanged = true;
+            isCtrl = false;
+            jottersavebutton.style.opacity = 1.0;
+            jottersavebutton.style.background = "red";
+
+        }
+
+        async function backupDataStores() {
+            // build a "fileString" consisting of jotter + "%%%$$$" + notesJson, pass this to php
+            // so that this can save it in a uniquely-named) file on the server and return the name
+            // so that we can use this to call download_babbackup.php to download this to the user's
+            // download folder (in a standard babbackup,txt file). This complicated to and fro is
+            // due to the fact that the Content-Disposition: attachment header doesn't work when
+            // it's called from javascript via an xmhttp request - you just get the file content
+            // in your response variable! - see https://medium.com/@drevets/you-cant-prompt-a-file-download-with-the-content-disposition-header-using-axios-xhr-sorry-56577aa706d6
+
+            const db = await idb.openDB('BaB', 1);
+
+            // get the jotter from the jotter store
+
+            const jotterObject = await db.get('jotter', 'user');
+            var jotter = jotterObject.text;
+
+            // now get all the notes
+
+            const noteObjects = await db.getAll('notes');
+
+            var notesArray = [];
+
+            if (noteObjects != undefined) {
+
+                for (var i = 0; i < noteObjects.length; i++) {
+
+                    // code the noteObject to minimize the size of the backup file
+                    // 'a' replaces 'notekey' (Series_num%Episode_nam%time)
+                    // 'b' replaces 'notetext'
+                    // 'c' replaces 'notetype' (q/n)
+                    //
+                    // 'noteprogrammekey' is dropped altogether as this can be determined from notekey
+
+                    if (noteObjects[i].notetype === "note") {
+                        noteObjects[i].notetype = "n";
+                    } else {
+                        noteObjects[i].notetype = "n";
+                    }
+
+                    notesArray[i] = { a: noteObjects[i].notekey, b: noteObjects[i].notetext, c: noteObjects[i].notetype };
+
+                }
+            }
+
+            // turn this lot into a json
+
+            var notesJson = JSON.stringify(notesArray);
+
+            // and now build the fileString and send it off to the server
+
+            var form = document.forms.namedItem("dummyform");
+            var oData = new FormData(form);
+            oData.append("helper_type", "backup_data_stores");
+            oData.append("file_string", jotter + "%%%$$$" + notesJson);
+            var oReq = new XMLHttpRequest();
+            oReq.open("POST", "https://ngatesystems.com/beagairbheag/php/player_helpers.php", true);
+            oReq.onload = function (oEvent) {
+                if (oReq.status == 200) {
+
+                    var response = oReq.responseText;
+                    if (response.indexOf("%failed%") != -1) {
+                        alert(response);
+                    }
+
+                    // response contains the unique filename generated for this backup. Edit the
+                    // backupdownloadlink <a> element to request its download
+
+                    var transitFilename = "babbackup" + response + ".txt";
+
+                    document.getElementById('backupdownloadlink').setAttribute('href', 'https://ngatesystems.com/beagairbheag/php/download_babbackup.php?transitfilename=' + transitFilename);
+                    document.getElementById('backupdownloadlink').click();
+                }
+            };
+            oReq.send(oData);
+        }
+
+        var restoreInProgress;
+        var restoreId;
+        function uploadBackupFile() {
+
+            // it's not possible to collect a filename from a local execution and expect it to
+            // be available in $_FILES when a server-based PHP program goes looking for it - we
+            // have to do this from web-sourced page. We launch this into a popup - but first
+            // of all, the transation is going to need some sort of unique identifier, so
+            // get this from the database and add it as a 'get' parameter so it's available to 
+            // the popup
+
+            var form = document.forms.namedItem("dummyform");
+            var oData = new FormData(form);
+            oData.append("helper_type", "increment_download_count");
+            var oReq = new XMLHttpRequest();
+            oReq.open("POST", "https://ngatesystems.com/beagairbheag/php/player_helpers.php", true);
+            oReq.onload = function (oEvent) {
+                if (oReq.status == 200) {
+
+                    var response = oReq.responseText;
+                    if (response.indexOf("%failed%") != -1) {
+                        alert(response);
+                    }
+
+                    var transitFilename = "babbackup" + response + ".txt";
+
+                    restoreInProgress = true;
+                    restoreId = response;
+                    displayPopupWindow("https://ngatesystems.com/beagairbheag/upload_babbackup.html?transitfilename=" + transitFilename);
+
+                    // the popup will create a function that auto-closes when the uses clicks outside.
+                    // this will fire restoreDataStores if it sees that restoreInProgress is true
+                }
+            };
+            oReq.send(oData);
+        }
+
+
+        async function restoreDataStores() {
+
+            // use the restoreId global variable to tell player_helpers where to find
+            // the unique file name allocated for this restore session. Suuply this as
+            // a GET parameter to maintain consistency with other elements of the 
+            // procedure
+
+            var transitFilename = "babbackup" + restoreId + ".txt";
+
+            var form = document.forms.namedItem("dummyform");
+            var oData = new FormData(form);
+            oData.append("helper_type", "restore_data_stores");
+            var oReq = new XMLHttpRequest();
+            oReq.open("POST", "https://ngatesystems.com/beagairbheag/php/player_helpers.php?transitfilename=" + transitFilename, true);
+            oReq.onload = async function (oEvent) {
+                if (oReq.status == 200) {
+
+                    var response = oReq.responseText;
+                    if (response.indexOf("%failed%") != -1) {
+                        alert(response);
+                    }
+
+                    // split the response into its jotter and notes_json elements
+
+                    responseElements = response.split("%%%$$$");
+                    var jotter = responseElements[0];
+                    var notesJson = responseElements[1];
+
+                    // open the Jotter and Notes stores, delete their content and
+                    // replace them with the recovered data
+
+                    const db = await idb.openDB('BaB', 1);
+
+                    // overwrite any existing jotter - the key is fixed
+
+                    {
+                        const tx = db.transaction('jotter', 'readwrite');
+                        var jotterObject = { 'jotterkey': 'user', 'text': sanitizeText(jotter) };
+
+                        try {
+                            await Promise.all([
+                                tx.store.put(jotterObject), // only a single store in play, so "store" references this automatically
+                            ]);
+                        } catch (e) {
+                            alert(e);
+                        }
+                    }
+
+                    // notes are a bit more tricky - need to delete all the existing notes
+                    // with a "clear" and then insert the replacements from the recovered
+                    // notes json. Should really do all of this in a txn but not sure how
+                    // just now
+
+                    const tx = db.transaction('notes', 'readwrite');
+                    notesArray = JSON.parse(notesJson);
+
+                    await tx.store.clear()
+                    for (var i = 0; i < notesArray.length; i++) {
+
+                        // reconstitute the packed noteObject
+
+                        var noteKeyElements = notesArray[i].a.split("%");
+                        var noteProgrammeKey = noteKeyElements[0] + "%" + noteKeyElements[1];
+
+                        if (notesArray[i].c === "n") {
+                            var noteType = "note";
+                        } else {
+                            var noteType = "query";
+                        }
+
+                        var noteObject = { notekey: notesArray[i].a, noteprogrammekey: noteProgrammeKey, notetext: notesArray[i].b, notetype: noteType };
+
+                        await tx.store.put(noteObject);
+                    }
+
+                    // now display an "OK" message in activitypanel and rebuild the noteline
+
+                    var message = "<p style='margin-top:3vh; text-align: center; color: blue'><span>Restore completed successfully</span></p>";
+                    setActivityPanelToString(message);
+
+                    buildNoteline(seriesNum, episodeNam, scaleFactor, scaleCorrectionForNote)
+                }
+            };
+            oReq.send(oData);
+        }
+
+        function displayColinMarkWindow() {
+            var dateObject = new Date();
+            var currentTime = dateObject.getTime();
+            var targetUrl = "https://ngatesystems.com/beagairbheag/colinmark/translationmasterclasses.html?ver=" + currentTime;
+            displayPopupWindow(targetUrl);
+
+        }
+
+        function displayPopupWindow(url) {
+
+            // popup is displayed as a centered panel of .75 display width and display height
+
+            var popupWidth = 0.75 * (window.innerWidth);
+            var popupHeight = 0.75 * (window.innerHeight);
+            var popupLeft = 0.5 * (window.innerWidth - popupWidth);
+            var popupTop = 0.5 * (window.innerHeight - popupHeight);
+
+            var popupSpecs = "width=" + popupWidth + ", height=" + popupHeight + ", left=" + popupLeft + ", top=" + popupTop + "t, resizable = yes, scrollbars = yes ";
+
+            event.stopPropagation(); // make sure we don't triggger the window click we set up later
+
+            var popUpWindow = window.open(url, "popUpWindow", popupSpecs);
+
+            // Create a temporary window.onclick function to close the popup and null itself when
+            // the use clicks outside
+
+            window.onclick = function () {
+                popUpWindow.close();
+
+                if (restoreInProgress) {
+                    restoreInProgress = false;
+                    restoreDataStores();
+                }
+
+                window.onclick = null;
+            };
+        }
+
+        function setActivityPanelToElement(newPanelId) {
+            var activitypanel = document.getElementById("activitypanel");
+            var newpanelid = document.getElementById(newPanelId);
+            activitypanel.innerHTML = newpanelid.innerHTML;
+            document.getElementById('currentsplashscreen').style.display = "none";
+        }
+
+        function setActivityPanelToString(htmlString) {
+            document.getElementById("activitypanel").innerHTML = htmlString;
+            document.getElementById('currentsplashscreen').style.display = "none";
+        }
+
+        function sanitizeText(textString) {
+
+            // Return a version of textString in which both single and double
+            // quotes have been replaced by the "right quote" character. The
+            // intention is to avoid confusing SQL and Javascript. The loss of
+            // functionlity is considered to be acceptable. In fact the use of
+            // a right quote in writing a' for example (where a right quote isn't
+            // actually available on thekeyboard) is probably preferrable
+
+            var temp = textString.replace(/'/g, "&rsquo;");
+            var temp1 = temp.replace(/"/g, "&rsquo;");
+            return temp1;
+        }
+
+        // show wait icon in the middle of the activity panel
+
+        var activitypanel = document.getElementById('activitypanel');
+        var activityPanelRect = activitypanel.getBoundingClientRect();
+
+        var xWaitIconPosition = activityPanelRect.left + activitypanel.offsetWidth / 2;
+        var yWaitIconPosition = activityPanelRect.top + activitypanel.offsetHeight / 2;
+
+        var waiticon = document.getElementById('waiticon');
+
+        function showWaitIcon() {
+            setActivityPanelToString('');
+            waiticon.style.left = xWaitIconPosition - 8 + "px";
+            waiticon.style.top = yWaitIconPosition - 8 + "px";
+            waiticon.style.display = "block";
+        }
+
+        function hideWaitIcon() {
+            // according to w3c spec this suspends operation of the animation as well as hiding it
+            waiticon.style.display = "none";
+        }
+
+        function zoomSplashScreen() {
+            // re-display the current splashscreen in the popupwindow as
+            // long as it's a .png file
+
+            if (currentSplashScreenFilename.indexOf("png") === 0) return;
+
+            document.getElementById('zoomedimage').src = "https://ngatesystems.com/beagairbheag/splashscreens/" + currentSplashScreenFilename;
+            document.getElementById('zoomdiv').style.display = 'block';
+
+            window.onclick = function () {
+                document.getElementById('zoomdiv').style.display = "none";
+                window.onclick = null;
+            };
+
+        }
+
+        ///// Audio Management Scripts //////////
+
+        var music = document.getElementById('music');
+        // synchronise currentTime with playhead position : it seems to
+        // fire every second or so.
+        music.addEventListener("timeupdate", timeUpdate);
+        var pbutton = document.getElementById('pbutton');
+
+        music.paused = true;
+
+        function toggleAudio() {
+            if (music.paused) {
+                playAudio();
+            } else {
+                pauseAudio();
+            }
+        }
+
+        function playAudio() {
+
+            // if the Companion can't find a download file for an episode it will display an
+            // error message via music.addEventListener and direct the user to the appropriate
+            // download file. But if at this point they click the play button (even after the 
+            // download is complete) Javascript throw a strange "Uncaught (in promise)
+            // DOMException: The element has no supported sources." error. Resetting music.src
+            // seems to clear this, but this also resets music.currentTime and since playAudio
+            // is called in numerous places, this rather messes things up unles we /only/
+            // reset music.src after we've had an error
+
+            if (audioExceptionMessageJustDisplayed) {
+
+                // clear the message in hopeful anticipation
+
+                setActivityPanelToString("<p style = 'text-align: center'>Download now located - thanks</p>");
+                audioExceptionMessageJustDisplayed = false;
+                music.src = currentBBCDownloadFilename + ".mp3"
+
+            }
+
+            music.play();
+            if (!audioExceptionMessageJustDisplayed)
+            pbutton.style.backgroundImage = "url('https://ngatesystems.com/beagairbheag/img/pause.png')";
+        }
+
+        function pauseAudio() {
+            music.pause();
+            pbutton.style.backgroundImage = "url('https://ngatesystems.com/beagairbheag/img/play.png')";
+        }
+
+        var rewindFinishTime;
+
+        function rewindAudio() {
+
+            // stop music whether playing or not
+            music.pause();
+            //rewind 5 seconds then restart and play for 7 sec - then rewind 2sec so back where started, then pause  
+            music.currentTime = Math.max(0, (music.currentTime - 5.0));
+            rewindFinishTime = music.currentTime + 7.0;
+            music.ontimeupdate = function () {
+                restrictMusic();
+            };
+            music.play();
+        }
+
+
+        function restrictMusic() {
+            // Stop music playing when it reaches rewindFinishTime
+            if (music.currentTime > rewindFinishTime) {
+                pauseAudio();
+                music.ontimeupdate = undefined;
+                music.currentTime = Math.max(0, (music.currentTime - 2.0));
+            }
+        }
+
+        var playhead = document.getElementById('playhead');
+        var currtime = document.getElementById("currtime");
+
+        // Synchronize playhead position with current point in audio
+        function timeUpdate() {
+
+            // We calculate the left margin of the playhead at time t seconds as :
+            // (t * (playWidth  - headWidth)) / duration)
+
+            playhead.style.marginLeft = (music.currentTime * (playWidth - headWidth)) / duration + "px";
+
+            currtime.innerHTML = formatTime(music.currentTime);
+
+            if (music.currentTime >= duration) {
+                pbutton.style.backgroundImage = "url('https://ngatesystems.com/beagairbheag/img/play.png')";
+                playhead.style.marginLeft = "0px";
+                music.paused = true;
+                currtime.innerHTML = "00:00:00";
+            }
+
+        }
+
+        // make playline clickable
+        playline.addEventListener("click", clickOnPlayline);
+
+        var clickOnPlayhead = false;
+        var musicInterruptedByMouseDown; //flag to show music was playing before mousedown event prior to moving playhead
+
+        function clickOnPlayline(event) {
+            // This function is intended to move the playhead to a new position. But if we mousedown 
+            // on the playhead at the start of a drag we also get a a "click on playline" when we lift the mouse
+            // at the end of the drag. So only respond to this click event if we /didn't/ mousedown on playhead
+
+            if (!clickOnPlayhead) {
+
+                // timeUpdate will move the playhead    
+                music.currentTime = duration * clickPercent(event);
+                playAudio();
+            }
+        }
+
+        // make playline respond to mousewheel
+        playline.addEventListener("wheel", wheelOnPlayline);
+
+        function wheelOnPlayline(event) {
+            // This function advances or rewinds the playhead by 2 sec in reponse to movements of the mouse wheel
+            console.log("inwheel");
+            // timeUpdate will move the playhead 
+            //Math.sign doesn't work in IE so use straight code
+            if (event.deltaY > 0) {
+                music.currentTime -= 2;
+            } else {
+                music.currentTime += 2;
+            }
+        }
+
+        // makes playhead draggable
+        playhead.addEventListener('pointerdown', mouseDownOnPlayhead);
+        playline.addEventListener('pointerup', mouseUpOnPlayhead);
+
+        // mouseDown EventListener
+        function mouseDownOnPlayhead() {
+            console.log("in mousedownonplayhead");
+            clickOnPlayhead = true;
+            // We use two techniques to move the playhead. Generally, the playhead is moved by the timeUpdate
+            // function which moves the playhead by tracking music.currentTime. But during "dragging" of the
+            // playhead (which is provided just as a more natural way of repositioning the playhead in a 
+            // "closeup" situation) it seems best to pause the sound to avoid garbled noises. During this 
+            // period we use "eventx" to pick up the physical position of the muse and actually turn off
+            // timeUpdate to avoid confusion. It gets restarted by mouseDownOnPlayhead
+
+            playline.addEventListener('pointermove', movePlayhead);
+            music.removeEventListener("timeupdate", timeUpdate);
+
+            musicInterruptedByMouseDown = false;
+            // pause music while mousedown
+            if (!music.paused) {
+                musicInterruptedByMouseDown = true;
+                pauseAudio
+            }
+        }
+
+        function mouseUpOnPlayhead(event) {
+
+            // mouseUp is always on playhead, but this may be as a result of a click on playline rather
+            // than a mousedown on playhead followed by a drag. Ignore the playline click
+
+            if (clickOnPlayhead) {
+                playline.removeEventListener('pointermove', movePlayhead);
+                // music.addEventListener("timeupdate", timeUpdate);
+                clickOnPlayhead = false;
+
+                music.currentTime = duration * clickPercent(event);
+                console.log("in mouseuponplayhead1 " + duration + " " + clickPercent(event));
+
+                // restart music if it was playing before we moved the playhead - but in the new position. The
+                // playhead position will be updated by timeUpdate
+                if (musicInterruptedByMouseDown) {
+                    playAudio();
+                }
+            }
+        }
+
+        // Move playhead as user drags
+        function movePlayhead(event) {
+
+            // move playhead using "Eventx" approach
+            var newMargLeft = event.clientX - getPosition(playline) - 0.5 * playhead.offsetWidth;
+            console.log("In movePlayhead newMargLeft duration " + newMargLeft + " " + duration);
+            document.getElementById("currtime").innerHTML = "&nbsp;&nbsp;" + formatTime(Math.round(duration * clickPercent(event))) + "/" + formatTime(duration);
+
+            if (newMargLeft >= 0 && newMargLeft <= playWidth) {
+                playhead.style.marginLeft = newMargLeft + "px";
+            }
+            if (newMargLeft < 0) {
+                playhead.style.marginLeft = "0px";
+            }
+            if (newMargLeft > playWidth) {
+                playhead.style.marginLeft = playWidth + "px";
+            }
+
+            // recoverTextPanel();
+        }
+
+        // return click as decimal proportion of the playWidth
+        function clickPercent(event) {
+            var position = getPosition(playline);
+            // clientx gives the pixel position of the click event relative to the left
+            // of the viewport
+            var returnval = (event.clientX - position - 0.5 * headWidth) / (playWidth - headWidth);
+            return returnval;
+        }
+
+
+        // getPosition
+        // Returns the pixel left position of the clecked element (inc padding and border)
+        // relative to top-left of viewport
+        function getPosition(el) {
+            var returnval = el.getBoundingClientRect().left;
+            return returnval;
+        }
+
+        var postTime;
+        var biteStartTime;
+        var biteFinishTime;
+        var rewindFinishTime;
+
+        //Play Soundbite
+        function playBite() {
+            // stop music (if playing), move playhead to biteStartime then start soundbite
+            if (!music.paused) {
+                // stop music
+                musicInterrupted = true;
+                music.currentTime = biteStartTime;
+            }
+            biteStartTime = postTime - 2.0;
+            biteStartTime = Math.max(0, biteStartTime);
+            biteFinishTime = postTime + 2.0;
+            music.currentTime = biteStartTime;
+            music.ontimeupdate = function () {
+                restrictSoundbite();
+            };
+            playAudio();
+        }
+
+        //Play soundbite nudged 1 second left
+        function playBiteNudgedLeft() {
+            postTime = postTime - 1.0;
+            biteStartTime = postTime - 2.0;
+            biteStartTime = Math.max(0, biteStartTime);
+            biteFinishTime = postTime + 2.0;
+            music.currentTime = biteStartTime;
+            music.ontimeupdate = function () {
+                restrictSoundbite();
+            };
+            playAudio();
+
+
+        }
+        //Play soundbite nudged 1 second right
+        function playBiteNudgedRight() {
+            postTime = postTime + 1.0
+            biteStartTime = postTime - 2.0;
+            biteStartTime = Math.max(0, biteStartTime);
+            biteFinishTime = postTime + 2.0;
+            music.currentTime = biteStartTime
+            music.ontimeupdate = function () {
+                restrictSoundbite();
+            };
+            playAudio();
+
+        }
+
+        //Play Soundbite in Edit Panel
+        function playBiteInEditPanel() {
+
+            if (!music.paused) {
+                // stop music
+                music.pause();
+                pButton.className = "play";
+            }
+            music.currentTime = postTime;
+            document.getElementById("currtime").innerHTML = formatTime(Math.round(postTime));
+            biteStartTime = postTime - 2.0;
+            biteStartTime = Math.max(0, biteStartTime);
+            biteFinishTime = postTime + 2.0;
+            music.currentTime = biteStartTime;
+            music.ontimeupdate = function () {
+                restrictSoundbite();
+            };
+            playAudio();
+
+        }
+
+        function restrictSoundbite() {
+            // Stop the soundbite when it reaches biteFinishTime and reset music.CurrentTime to postTime
+            if (music.currentTime > biteFinishTime) {
+                music.ontimeupdate = undefined;
+                pauseAudio();
+                music.currentTime = postTime;
+                document.getElementById("currtime").innerHTML = formatTime(Math.round(postTime));
+            }
+        }
+        function timeToSeconds(time) {
+
+            // convert a database coded "time" field (mmss) to econds
+
+            var timeSeconds = time % 100;
+            var timeMinutes = (time - timeSeconds) / 100;
+            return timeMinutes * 60 + timeSeconds;
+        }
+
+        // Formats currentTime in ssssss.ssss as hh:mm:ss : rounds to nearest integer
+        function formatTime(t) {
+            t = Math.round(t);
+            var s = t % 60;
+            var m = Math.floor(t / 60) % 60;
+            var h = Math.floor(t / 3600);
+            var tFormatted = normaliseTime(h) + ":" + normaliseTime(m) + ":" + normaliseTime(s);
+            return tFormatted;
+        }
+
+        // add a leading zero to a time field if necessary
+        function normaliseTime(t) {
+            var nt = t.toString();
+            if (t < 10) {
+                nt = "0" + t;
+            }
+            return nt;
+        }
+
+
+    </script>
+</body>
+
+</html>

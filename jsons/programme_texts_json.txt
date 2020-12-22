@@ -1,0 +1,659 @@
+var programmeTextsJson = '[\
+{\
+"seriesnum" : "1",\
+"episodenam" : "Episode 1",\
+"texttype" : "tarscriobh",\
+"texttitle" : "2",\
+"starttimeinprogramme" : "2",\
+"finishtimeinprogramme" : "3",\
+"texturl" : "3"\
+},\
+{\
+"seriesnum" : "8",\
+"episodenam" : "Episode 6",\
+"texttype" : "tarscriobh",\
+"texttitle" : "Pàirc Hampden",\
+"starttimeinprogramme" : "130",\
+"finishtimeinprogramme" : "618",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/1tRWFQnmJQYwqJRfvKF3rD0/tar-sgriobhadh-program-choinnich"\
+},\
+{\
+"seriesnum" : "8",\
+"episodenam" : "Episode 6",\
+"texttype" : "tarscriobh",\
+"texttitle" : "0",\
+"starttimeinprogramme" : "1329",\
+"finishtimeinprogramme" : "2007",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/1tRWFQnmJQYwqJRfvKF3rD0/tar-sgriobhadh-program-choinnich"\
+},\
+{\
+"seriesnum" : "8",\
+"episodenam" : "Episode 6",\
+"texttype" : "",\
+"texttitle" : "1",\
+"starttimeinprogramme" : "2031",\
+"finishtimeinprogramme" : "2222",\
+"texturl" : ""\
+},\
+{\
+"seriesnum" : "8",\
+"episodenam" : "Episode 6",\
+"texttype" : "",\
+"texttitle" : "2",\
+"starttimeinprogramme" : "2736",\
+"finishtimeinprogramme" : "3500",\
+"texturl" : ""\
+},\
+{\
+"seriesnum" : "8",\
+"episodenam" : "Episode 6",\
+"texttype" : "",\
+"texttitle" : "3",\
+"starttimeinprogramme" : "3618",\
+"finishtimeinprogramme" : "4307",\
+"texturl" : ""\
+},\
+{\
+"seriesnum" : "8",\
+"episodenam" : "Episode 6",\
+"texttype" : "",\
+"texttitle" : "4",\
+"starttimeinprogramme" : "4318",\
+"finishtimeinprogramme" : "5010",\
+"texturl" : ""\
+},\
+{\
+"seriesnum" : "8",\
+"episodenam" : "Episode 7",\
+"texttype" : "",\
+"texttitle" : "5",\
+"starttimeinprogramme" : "150",\
+"finishtimeinprogramme" : "615",\
+"texturl" : ""\
+},\
+{\
+"seriesnum" : "8",\
+"episodenam" : "Episode 7",\
+"texttype" : "",\
+"texttitle" : "6",\
+"starttimeinprogramme" : "1400",\
+"finishtimeinprogramme" : "2200",\
+"texturl" : ""\
+},\
+{\
+"seriesnum" : "8",\
+"episodenam" : "Episode 7",\
+"texttype" : "",\
+"texttitle" : "7",\
+"starttimeinprogramme" : "2230",\
+"finishtimeinprogramme" : "2420",\
+"texturl" : ""\
+},\
+{\
+"seriesnum" : "8",\
+"episodenam" : "Episode 7",\
+"texttype" : "",\
+"texttitle" : "8",\
+"starttimeinprogramme" : "2900",\
+"finishtimeinprogramme" : "3430",\
+"texturl" : ""\
+},\
+{\
+"seriesnum" : "8",\
+"episodenam" : "Episode 7",\
+"texttype" : "",\
+"texttitle" : "9",\
+"starttimeinprogramme" : "3500",\
+"finishtimeinprogramme" : "4200",\
+"texturl" : ""\
+},\
+{\
+"seriesnum" : "8",\
+"episodenam" : "Episode 7",\
+"texttype" : "",\
+"texttitle" : "10",\
+"starttimeinprogramme" : "4240",\
+"finishtimeinprogramme" : "4730",\
+"texturl" : ""\
+},\
+{\
+"seriesnum" : "8",\
+"episodenam" : "Episode 8",\
+"texttype" : "",\
+"texttitle" : "11",\
+"starttimeinprogramme" : "150",\
+"finishtimeinprogramme" : "615",\
+"texturl" : ""\
+},\
+{\
+"seriesnum" : "8",\
+"episodenam" : "Episode 8",\
+"texttype" : "",\
+"texttitle" : "12",\
+"starttimeinprogramme" : "1406",\
+"finishtimeinprogramme" : "2040",\
+"texturl" : ""\
+},\
+{\
+"seriesnum" : "8",\
+"episodenam" : "Episode 8",\
+"texttype" : "",\
+"texttitle" : "13",\
+"starttimeinprogramme" : "2055",\
+"finishtimeinprogramme" : "2238",\
+"texturl" : ""\
+},\
+{\
+"seriesnum" : "8",\
+"episodenam" : "Episode 8",\
+"texttype" : "",\
+"texttitle" : "14",\
+"starttimeinprogramme" : "2805",\
+"finishtimeinprogramme" : "3654",\
+"texturl" : ""\
+},\
+{\
+"seriesnum" : "8",\
+"episodenam" : "Episode 8",\
+"texttype" : "",\
+"texttitle" : "15",\
+"starttimeinprogramme" : "3725",\
+"finishtimeinprogramme" : "4414",\
+"texturl" : ""\
+},\
+{\
+"seriesnum" : "8",\
+"episodenam" : "Episode 8",\
+"texttype" : "",\
+"texttitle" : "16",\
+"starttimeinprogramme" : "4435",\
+"finishtimeinprogramme" : "5035",\
+"texturl" : ""\
+},\
+{\
+"seriesnum" : "9",\
+"episodenam" : "Episode 1",\
+"texttype" : "",\
+"texttitle" : "17",\
+"starttimeinprogramme" : "1040",\
+"finishtimeinprogramme" : "1939",\
+"texturl" : ""\
+},\
+{\
+"seriesnum" : "9",\
+"episodenam" : "Episode 1",\
+"texttype" : "",\
+"texttitle" : "18",\
+"starttimeinprogramme" : "1959",\
+"finishtimeinprogramme" : "2150",\
+"texturl" : ""\
+},\
+{\
+"seriesnum" : "9",\
+"episodenam" : "Episode 1",\
+"texttype" : "",\
+"texttitle" : "19",\
+"starttimeinprogramme" : "2742",\
+"finishtimeinprogramme" : "3646",\
+"texturl" : ""\
+},\
+{\
+"seriesnum" : "9",\
+"episodenam" : "Episode 1",\
+"texttype" : "",\
+"texttitle" : "20",\
+"starttimeinprogramme" : "4544",\
+"finishtimeinprogramme" : "5020",\
+"texturl" : ""\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 1",\
+"texttype" : "blasadbeag",\
+"texttitle" : "Greetings",\
+"starttimeinprogramme" : "953",\
+"finishtimeinprogramme" : "1428",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/4vfmf20kWqT2j6WxS99Pq9l/blasad-beag-episode-11-greetings"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 1",\
+"texttype" : "muthim",\
+"texttitle" : "Anns aʼ Chidsin",\
+"starttimeinprogramme" : "1918",\
+"finishtimeinprogramme" : "2401",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/4LJFMLBMzk3YJy0dqZRKxpc/mu-thimcheall-episode-1-anns-a-chi"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 1",\
+"texttype" : "tarscriobh",\
+"texttitle" : "Aois 60",\
+"starttimeinprogramme" : "3126",\
+"finishtimeinprogramme" : "3225",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/1YBmJ32z9p9FP0XxTktD5yn/tar-sgriobhadh-aois-60"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 1",\
+"texttype" : "oiseanagr",\
+"texttitle" : "12.1 o",\
+"starttimeinprogramme" : "3802",\
+"finishtimeinprogramme" : "4413",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/GvYwwrkn2tg4HBt2jHtpsN/oisean-a-ghramair-sreath-12-1"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 1",\
+"texttype" : "aithrisn",\
+"texttitle" : "12.1 a",\
+"starttimeinprogramme" : "4522",\
+"finishtimeinprogramme" : "5010",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/2STBJW6nX7ZW5SgkVcKQrkQ/aithris-naidheachd-na-seachdain-1"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 2",\
+"texttype" : "blasadbeag",\
+"texttitle" : "Introductions",\
+"starttimeinprogramme" : "801",\
+"finishtimeinprogramme" : "1246",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/4bcKCX8901SGdkQmfsKqRg7/blasad-beag-episode-2-introduction"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 2",\
+"texttype" : "muthim",\
+"texttitle" : "Ans aʼ bhùth",\
+"starttimeinprogramme" : "1717",\
+"finishtimeinprogramme" : "2158",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/4FxcpRHXGB7y57yLRbYy7LZ/mu-thimcheall-episode-2-anns-a-bhu"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 2",\
+"texttype" : "tarscriobh",\
+"texttitle" : "Beagan Spìosradh Nam Beatha",\
+"starttimeinprogramme" : "2955",\
+"finishtimeinprogramme" : "3120",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/5X6pLS75Vqfw8GGNqvcy6sB/tar-sgriobhadh-beagan-spiosraidh-n"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 2",\
+"texttype" : "oiseanagr",\
+"texttitle" : "12.2o",\
+"starttimeinprogramme" : "3828",\
+"finishtimeinprogramme" : "4501",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/1KnRZYPQX2jh0VhPXZqM8ft/oisean-a-ghramair-sreath-12-2"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 2",\
+"texttype" : "aithrisn",\
+"texttitle" : "12.2a",\
+"starttimeinprogramme" : "4537",\
+"finishtimeinprogramme" : "4957",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/1Nb8F7wp4my8vygCRVfJbkP/aithris-naidheachd-na-seachdain-2"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 3",\
+"texttype" : "blasadbeag",\
+"texttitle" : "The weather - part 1",\
+"starttimeinprogramme" : "745",\
+"finishtimeinprogramme" : "1241",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/3FbhyML5zZyqq01Hdy4Xzsk/blasad-beag-episode-3-weather"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 3",\
+"texttype" : "muthim",\
+"texttitle" : "Anns aʼ Phàirc",\
+"starttimeinprogramme" : "1751",\
+"finishtimeinprogramme" : "2223",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/2wf0pGt1ghPMskC93vj16pb/mu-thimcheall-episode-3-anns-a-phairc"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 3",\
+"texttype" : "tarscriobh",\
+"texttitle" : "Cuin a tha còir aig daoine an dreuchdan fhàgail",\
+"starttimeinprogramme" : "3029",\
+"finishtimeinprogramme" : "3210",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/3S03czysdfz8kWjWLYjTkyR/tar-sgriobhadh-feasgar"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 3",\
+"texttype" : "oiseanagr",\
+"texttitle" : "12.3",\
+"starttimeinprogramme" : "3934",\
+"finishtimeinprogramme" : "4454",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/1dt9JQND4Kwzq8jmsszlbsR/oisean-a-ghramair-sreath-12-3"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 3",\
+"texttype" : "aithrisn",\
+"texttitle" : "riaghailtean an lockdown",\
+"starttimeinprogramme" : "4530",\
+"finishtimeinprogramme" : "5003",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/32FJnDrdt3d1798947qmQ7m/aithris-naidheachd-na-seachdain-3"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 4",\
+"texttype" : "blasadbeag",\
+"texttitle" : "The weather - part 2",\
+"starttimeinprogramme" : "702",\
+"finishtimeinprogramme" : "1156",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/3w5LQ1lY55hslS6TV4llXLg/blasad-beag-episode-4-weather"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 4",\
+"texttype" : "muthim",\
+"texttitle" : "Anns an Oifis",\
+"starttimeinprogramme" : "1636",\
+"finishtimeinprogramme" : "2113",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/2ZRvLvjDFFHLsSq4cSwlnW7/mu-thimcheall-episode-4-anns-an-oifis"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 4",\
+"texttype" : "tarscriobh",\
+"texttitle" : "Pìobairean",\
+"starttimeinprogramme" : "2936",\
+"finishtimeinprogramme" : "3113",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/40R5YB0Q3Nqx9dhDXrTBRlS/tar-sgriobhadh-piobairean"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 4",\
+"texttype" : "oiseanagr",\
+"texttitle" : "12.4",\
+"starttimeinprogramme" : "3830",\
+"finishtimeinprogramme" : "4442",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/hpr6YTYtdFY48PHH0rKTWl/oisean-a-ghramair-sreath-12-4"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 4",\
+"texttype" : "aithrisn",\
+"texttitle" : "cothrom aig daoine tadhal air luchd-còmhnaidh",\
+"starttimeinprogramme" : "4534",\
+"finishtimeinprogramme" : "5003",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/33ghDwkqV8rnWJDHSj6fMNg/aithris-naidheachd-na-seachdain-4"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 5",\
+"texttype" : "blasadbeag",\
+"texttitle" : "Food and Drink (Episode 5)",\
+"starttimeinprogramme" : "812",\
+"finishtimeinprogramme" : "1252",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/479mNy5BKSmJnKGhljNP3LT/blasad-beag-episode-5-food-and-drink"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 5",\
+"texttype" : "muthim",\
+"texttitle" : "Anns aʼ Ghàrradh",\
+"starttimeinprogramme" : "1746",\
+"finishtimeinprogramme" : "2217",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/330kwXPtZdVFgyS6TcY7h1T/mu-thimcheall-episode-5-anns-a-gharradh"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 5",\
+"texttype" : "tarscriobh",\
+"texttitle" : "Airgead",\
+"starttimeinprogramme" : "2848",\
+"finishtimeinprogramme" : "3015",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/1npKBXLdvh9TvdFCph54gP/tar-sgriobhadh-airgead"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 5",\
+"texttype" : "oiseanagr",\
+"texttitle" : "12.5",\
+"starttimeinprogramme" : "3711",\
+"finishtimeinprogramme" : "4509",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/5nNjcL0Hz3bdbP4NJXXp7kZ/oisean-a-ghramair-sreath-12-5"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 5",\
+"texttype" : "aithrisn",\
+"texttitle" : "Na Stàitean Aonaichte",\
+"starttimeinprogramme" : "4602",\
+"finishtimeinprogramme" : "5133",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/4qNSHyTxDM5kv88R2MLWJ4X/aithris-naidheachd-na-seachdain-5"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 6",\
+"texttype" : "blasadbeag",\
+"texttitle" : "Food and Drink (Episode 6)",\
+"starttimeinprogramme" : "658",\
+"finishtimeinprogramme" : "1157",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/4l61dCmPnDbmyp9Y5M9hXf2/blasad-beag-episode-6-food-and-drink"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 6",\
+"texttype" : "muthim",\
+"texttitle" : "Anns aʼ Bhùth - Chofaidh",\
+"starttimeinprogramme" : "1555",\
+"finishtimeinprogramme" : "2021",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/1S3PtQvY6qDwMsXhXYc3d5n/mu-thimcheall-episode-6-anns-a-bhuth-chofaidh"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 6",\
+"texttype" : "tarscriobh",\
+"texttitle" : "Leugh an Leabhar",\
+"starttimeinprogramme" : "2752",\
+"finishtimeinprogramme" : "2915",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/ktHm9QGnXPHbcsN3CFlZGP/tar-sgriobhadh-leugh-an-leabhar"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 6",\
+"texttype" : "oiseanagr",\
+"texttitle" : "12.6",\
+"starttimeinprogramme" : "3801",\
+"finishtimeinprogramme" : "4558",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/4fc4hGM55Pwc50VXTtKBwDh/oisean-a-ghramair-sreath-12-6"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 6",\
+"texttype" : "aithrisn",\
+"texttitle" : "Cha bhith “Viva Espana” ann am-bliadhna",\
+"starttimeinprogramme" : "4648",\
+"finishtimeinprogramme" : "5126",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/36GfybWqLTmsJP05KT7zjC9/aithris-naidheachd-na-seachdain-6"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 7",\
+"texttype" : "blasadbeag",\
+"texttitle" : "Likes and Dislikes (Episode 7)",\
+"starttimeinprogramme" : "735",\
+"finishtimeinprogramme" : "1207",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/479kN16tDHCDmD3DGs3kRD9/blasad-beag-episode-7-likes-and-dislikes"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 7",\
+"texttype" : "muthim",\
+"texttitle" : "Cuairt tron bhaile",\
+"starttimeinprogramme" : "1705",\
+"finishtimeinprogramme" : "2112",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/4Lz8dLphqpJhkf4VSq5ZC89/mu-thimcheall-episode-7-cuairt-tron-bhaile"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 7",\
+"texttype" : "tarscriobh",\
+"texttitle" : "Nam Bhoireannach",\
+"starttimeinprogramme" : "2722",\
+"finishtimeinprogramme" : "2838",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/2KHWVYTykWc3C8jLwQMLtB6/tar-sgriobhadh-nam-bhoireannach"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 7",\
+"texttype" : "oiseanagr",\
+"texttitle" : "12.7",\
+"starttimeinprogramme" : "3557",\
+"finishtimeinprogramme" : "4217",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/3pkgjVgqqXF21bGKGw9vDMs/oisean-a-ghramair-sreath-12-7"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 7",\
+"texttype" : "aithrisn",\
+"texttitle" : "An sgeama fòrlaidh",\
+"starttimeinprogramme" : "4310",\
+"finishtimeinprogramme" : "4815",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/315M56JgXnKMgxNQRJJt8yt/aithris-naidheachd-na-seachdain-7"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 8",\
+"texttype" : "blasadbeag",\
+"texttitle" : "Numbers (Episode 8)",\
+"starttimeinprogramme" : "654",\
+"finishtimeinprogramme" : "1146",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/JgmDtvBlCPvvdmWnWs5Clt/blasad-beag-episode-8-numbers"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 8",\
+"texttype" : "muthim",\
+"texttitle" : "Ann an taigh-bìdh",\
+"starttimeinprogramme" : "1655",\
+"finishtimeinprogramme" : "2117",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/2DPdLpnc5ChcKk10mQBLHPY/mu-thimcheall-episode-8-ann-an-taigh-bidh"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 8",\
+"texttype" : "tarscriobh",\
+"texttitle" : "Leugh an Leabhar",\
+"starttimeinprogramme" : "2959",\
+"finishtimeinprogramme" : "3142",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/2W0xJq7Z94kfb8jVwCQ8S0c/tar-sgriobhadh-leugh-an-leabhar"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 8",\
+"texttype" : "oiseanagr",\
+"texttitle" : "12.8",\
+"starttimeinprogramme" : "4021",\
+"finishtimeinprogramme" : "4534",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/4zGTZH1X8zvYl2cM74mSsk7/oisean-a-ghramair-sreath-12-8"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 8",\
+"texttype" : "aithrisn",\
+"texttitle" : "Rocaid China",\
+"starttimeinprogramme" : "4607",\
+"finishtimeinprogramme" : "5038",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/4qnNLlTfqJ9GbJn2ddyDzH8/aithris-naidheachd-na-seachdain-8"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 9",\
+"texttype" : "blasadbeag",\
+"texttitle" : "Colours (Episode 9)",\
+"starttimeinprogramme" : "631",\
+"finishtimeinprogramme" : "1105",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/26NXFYHwmTcysQlld4hdJ7c/blasad-beag-episode-9-colours"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 9",\
+"texttype" : "muthim",\
+"texttitle" : "Selections from earlier episodes",\
+"starttimeinprogramme" : "1605",\
+"finishtimeinprogramme" : "2148",\
+"texturl" : "https://ngatesystems.com/beagairbheag/img/pending_text.html"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 9",\
+"texttype" : "tarscriobh",\
+"texttitle" : "Sgeulachd Beatha",\
+"starttimeinprogramme" : "2707",\
+"finishtimeinprogramme" : "2814",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/4c30VKJL1WGllTGDhz99P3K/tar-sgriobhadh-sgeulachd-beatha"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 9",\
+"texttype" : "oiseanagr",\
+"texttitle" : "12.9",\
+"starttimeinprogramme" : "3544",\
+"finishtimeinprogramme" : "4323",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/10TNDdwFS5wWF0kjw0Sfm1H/oisean-a-ghramair-sreath-12-9"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 9",\
+"texttype" : "aithrisn",\
+"texttitle" : "An àireamh de phòsaidhean ",\
+"starttimeinprogramme" : "4413",\
+"finishtimeinprogramme" : "4906",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/53F3rfj0qhycgsHLy7hQMf7/blasad-beag-episode-10-what-time-is-it"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 10",\
+"texttype" : "blasadbeag",\
+"texttitle" : "What time is it? (Episode 10)",\
+"starttimeinprogramme" : "901",\
+"finishtimeinprogramme" : "1306",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/26NXFYHwmTcysQlld4hdJ7c/blasad-beag-episode-9-colours"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 10",\
+"texttype" : "muthim",\
+"texttitle" : "Selections from earlier episodes",\
+"starttimeinprogramme" : "1815",\
+"finishtimeinprogramme" : "2346",\
+"texturl" : "https://ngatesystems.com/beagairbheag/img/pending_text.html"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 10",\
+"texttype" : "tarscriobh",\
+"texttitle" : "Smuain na Maidne - daoine ann a tha an-còmhnaidh a’ dol aig astar.",\
+"starttimeinprogramme" : "2859",\
+"finishtimeinprogramme" : "3006",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/4c30VKJL1WGllTGDhz99P3K/tar-sgriobhadh-sgeulachd-beatha"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 10",\
+"texttype" : "oiseanagr",\
+"texttitle" : "12.10",\
+"starttimeinprogramme" : "3644",\
+"finishtimeinprogramme" : "4342",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/dDmvD9tMqQsMcdpj3Qkr76/oisean-a-ghramair-sreath-12-10"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 10",\
+"texttype" : "aithrisn",\
+"texttitle" : "Ceannardan boireann agus a’ Choròna-bhìorais",\
+"starttimeinprogramme" : "4440",\
+"finishtimeinprogramme" : "4936",\
+"texturl" : "https://www.bbc.co.uk/programmes/articles/2rZk24JlLxg1zwZTTBwvJ35/aithris-naidheachd-na-seachdain-10"\
+}\
+]';

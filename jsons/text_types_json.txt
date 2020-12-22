@@ -1,0 +1,32 @@
+var textTypesJson = '[\
+{\
+"texttype": "aithrisn",\
+"textcolor": "silver",\
+"textheader": "Aithris Naidheachd"\
+},\
+{\
+"texttype": "blasadbeag",\
+"textcolor": "blue",\
+"textheader": "Blasad Beag"\
+},\
+{\
+"texttype": "muthim",\
+"textcolor": "hotpink",\
+"textheader": "Mu Thimcheall"\
+},\
+{\
+"texttype": "oiseanagr",\
+"textcolor": "fuchsia",\
+"textheader": "Oisean aʼ Ghràmair"\
+},\
+{\
+"texttype": "suilairamh",\
+"textcolor": "purple",\
+"textheader": "Sùil air a&rsquo; Mhapa"\
+},\
+{\
+"texttype": "tarscriobh",\
+"textcolor": "lightgreen",\
+"textheader": "Tar-sgrìobhadh"\
+}\
+]';

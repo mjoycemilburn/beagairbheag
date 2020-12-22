@@ -1,0 +1,112 @@
+var programmesJson = '[\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 1",\
+"firstondate" : "2020/06/14",\
+"finishtime" : "5421",\
+"learneroftheweek" : "Kevin Leetion",\
+"bbcprogrammeurl" : "https://www.bbc.co.uk/programmes/m000k423",\
+"bbcdownloadfilename" : "BeagAirBheag-20200614-Episode1",\
+"splashscreenfilename" : "red_book.png",\
+"splashscreentitle" : "Leabhar Dearg Chlann Mhuirich - courtey Scottish Nat Coll"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 2",\
+"firstondate" : "2020/06/21",\
+"finishtime" : "5432",\
+"learneroftheweek" : "Gillian Mucklow",\
+"bbcprogrammeurl" : "https://www.bbc.co.uk/programmes/m000k7x4",\
+"bbcdownloadfilename" : "BeagAirBheag-20200621-Episode2",\
+"splashscreenfilename" : "sgothan.png",\
+"splashscreentitle" : "Sgothan - courtesy Scottish Nat Mus"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 3",\
+"firstondate" : "2020/06/28",\
+"finishtime" : "5531",\
+"learneroftheweek" : "Cailean MacCoinnich",\
+"bbcprogrammeurl" : "https://www.bbc.co.uk/programmes/m000kfnm",\
+"bbcdownloadfilename" : "BeagAirBheag-20200628-Episode3",\
+"splashscreenfilename" : "guga.png",\
+"splashscreentitle" : "Guga blasda - courtesy homeschoolonthecroft.blogspot.com"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 4",\
+"firstondate" : "2020/07/05",\
+"finishtime" : "5531",\
+"learneroftheweek" : "Michelle Otto",\
+"bbcprogrammeurl" : "https://www.bbc.co.uk/programmes/m000knbw",\
+"bbcdownloadfilename" : "BeagAirBheag-20200705-Episode4",\
+"splashscreenfilename" : "loom.png",\
+"splashscreentitle" : "Beart-fhighe - courtesy Getty"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 5",\
+"firstondate" : "2020/07/12",\
+"finishtime" : "5604",\
+"learneroftheweek" : "Crìsdean Oates",\
+"bbcprogrammeurl" : "https://www.bbc.co.uk/programmes/m000kt7h",\
+"bbcdownloadfilename" : "BeagAirBheag-20200712-Episode5",\
+"splashscreenfilename" : "glencoe.png",\
+"splashscreentitle" : "Gleann Comhann - courtesy Nat Trust Scotland"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 6",\
+"firstondate" : "2020/07/19",\
+"finishtime" : "5541",\
+"learneroftheweek" : "Jenny NicLeòid",\
+"bbcprogrammeurl" : "https://www.bbc.co.uk/programmes/m000l2sf",\
+"bbcdownloadfilename" : "BeagAirBheag-20200719-Episode6",\
+"splashscreenfilename" : "culloden.png",\
+"splashscreentitle" : "Blàr Chùl Lodair - courtesy Royal collection"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 7",\
+"firstondate" : "2020/07/26",\
+"finishtime" : "5341",\
+"learneroftheweek" : "Keith MacCoinnich",\
+"bbcprogrammeurl" : "https://www.bbc.co.uk/programmes/m000l7pg",\
+"bbcdownloadfilename" : "BeagAirBheag-20200726-Episode7",\
+"splashscreenfilename" : "sabhalmor.png",\
+"splashscreentitle" : "Sabhal Mor Ostaig - courtesy Ross-Shire journals"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 8",\
+"firstondate" : "2020/08/02",\
+"finishtime" : "5452",\
+"learneroftheweek" : "Karrie Prescott",\
+"bbcprogrammeurl" : "https://www.bbc.co.uk/programmes/m000lgw1",\
+"bbcdownloadfilename" : "BeagAirBheag-20200802-Episode8",\
+"splashscreenfilename" : "herring_girls.png",\
+"splashscreentitle" : "Clann-nighean an Sgadain"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 9",\
+"firstondate" : "2020/08/09",\
+"finishtime" : "5407",\
+"learneroftheweek" : "Ruth NicAlpainn",\
+"bbcprogrammeurl" : "https://www.bbc.co.uk/programmes/m000llmw",\
+"bbcdownloadfilename" : "BeagAirBheag-20200809-Episode9",\
+"splashscreenfilename" : "scots_pine.png",\
+"splashscreentitle" : "giuthas-Albannach - courtesy scotlandinfo.eu/scottish-highlands"\
+},\
+{\
+"seriesnum" : "12",\
+"episodenam" : "Episode 10",\
+"firstondate" : "2020/08/16",\
+"finishtime" : "5454",\
+"learneroftheweek" : "Various",\
+"bbcprogrammeurl" : "https://www.bbc.co.uk/programmes/m000ltr7",\
+"bbcdownloadfilename" : "BeagAirBheag-20200816-Episode10",\
+"splashscreenfilename" : "st_kilda.png",\
+"splashscreentitle" : "Hiort - an t-sràid ann an 1886 - courtest Wikipedia creative commons "\
+}\
+]';

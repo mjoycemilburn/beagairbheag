@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+
+<head>
+
+</head>
+
+
+<body>
+    <form id="backupfileselectform" style="width: 50vw; padding: 4vw" enctype="multipart/form-data">
+        <p> <label>Backup filename:</label>
+            <input type='file' id='backupfilenameid' name='backupfilename' maxlength="32" size="12">
+            <button id="uploadbutton" type="button"
+                onclick="document.getElementById('finalize').style.display = 'block'; uploadBackupFile();">Restore
+            </button>
+        </p>
+    </form>
+
+    <div id="finalize" style="display: none; margin-top: 3vh; color: red; text-align: center;">
+        <span>OK - all good. Now click outside this popup to finalize the restore</span>
+    </div>
+
+    <!-- the "Restore" button above will fire up player_helpers to upload the supplied backup file above
+         and save it on the server. We need a unique filename for this, to make sure a user doesn't
+         end up with someone else's data. upload_babbackup.html will have been passed a unique id
+         as a GET parameter. Retrieve this and pass it, in turn to player_helpers as another GET
+         parameter (could use POST, of course, but all the rest of this complex interaction uses
+         GET, so best stick with it -->
+
+    <script>
+
+        function uploadBackupFile() {
+
+            // retrieve the in-coming transitFilename
+
+            var transitFilename = getUrlParameter('transitfilename');
+
+            var form = document.forms.namedItem("backupfileselectform");
+            var oData = new FormData(form);
+            oData.append("helper_type", "upload_backup_file");
+            var oReq = new XMLHttpRequest();
+            oReq.open("POST", "https://ngatesystems.com/beagairbheag/php/player_helpers.php?transitfilename=" + transitFilename, true);
+            oReq.onload = async function (oEvent) {
+                if (oReq.status == 200) {
+
+                    var response = oReq.responseText;
+                    if (response.indexOf("%failed%") != -1) {
+                        alert(response);
+                    }
+                }
+            }
+            oReq.send(oData);
+        }
+
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(window.location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+    </script>
+
+</body>
+
+</html>
