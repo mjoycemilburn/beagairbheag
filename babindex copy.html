@@ -508,8 +508,6 @@
             // fade the fugitive buttons by triggering a transition
             fadeButtonDiv('buttondiv1');
             fadeButtonDiv('buttondiv2');
-    
-            buildProgrammePicklists(currentSeriesNum, currentEpisodeNam);
 
             buildScreenForCurrentEpisode();
 
@@ -601,6 +599,8 @@
                 document.getElementById('firstondate').innerHTML = currentFirstOnDate;
                 document.getElementById('learneroftheweek').innerHTML = currentLearnerOfTheWeek;
                 document.getElementById("dictionarypref").textContent = currentDictionaryPref;
+
+            buildProgrammePicklists(currentSeriesNum, currentEpisodeNam);
 
             // get the pixel widths of the playline and playhead - these are key parameter
             // used throughout the rest of the layout, determining the absolute position of
@@ -1314,7 +1314,7 @@
 
 
                         var highlightedTextBlock = textBlock.replace(searchRegex, '<b style ="color: red;">$&</b>');
-                        results += "<span>... " + decodeURI(highlightedTextBlock) + " ...</span><br><br>";
+                        results += "<span>... " + highlightedTextBlock + " ...</span><br><br>";
                     }
                 }
 
@@ -1368,7 +1368,7 @@
         }
 
         async function saveJotter() {
-
+            
             // save the user jotter - encode the text because any ' and " characters will confuse javascript
 
             var jotterObject = { 'jotterkey': 'user', 'text': encodeURI(document.getElementById('userjotter').value) };
