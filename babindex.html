@@ -44,6 +44,14 @@
             display: block;
             cursor: pointer;
         }
+
+                .babbutton {
+            padding: .25rem;
+            font: larger;
+            background-color:aquamarine;
+            border: 1px solid black;
+            border-radius: 4px;
+        }
     </style>
 
 </head>
@@ -171,11 +179,11 @@
                     <img id="logo" style="max-width:100%;" src="https://ngatesystems.com/beagairbheag/img/logo.png"
                         alt="Beag Air Bheag Companion logo">
                     <p></p>
-                    <div style="margin-top: 10px;">
-                        <button onclick="setActivityPanelToString(about);" type="button"
+                    <div style="margin-top: 10px; text-align: center;">
+                        <button class = "babbutton" onclick="setActivityPanelToString(about);" type="button"
                             title="About the Companion">About
                         </button>&nbsp;&nbsp;&nbsp;
-                        <button onclick="setActivityPanelToString(hints);" type="button" title="Click for Hints">Hints
+                        <button class = "babbutton" onclick="setActivityPanelToString(hints);" type="button" title="Click for Hints">Hints
                         </button>
                     </div>
                 </div>
@@ -211,7 +219,7 @@
                 <p><strong>Want a different programme? </strong></p>
                 <p>Series <span id="seriespicklistcontainer"></span> : <span id="episodepicklistcontainer"></span></p>
                 <br>
-                <p>Current dictionary : <button id="dictionarypref" title="Toggle text look-up dictionary"
+                <p>Current dictionary : <button id="dictionarypref"  class = "babbutton" title="Toggle text look-up dictionary"
                         onclick="toggleDictionaryPref()"></button></p>
                 <p id="currentsplashscreen">Current splash-screen:<br>
                     <i id='splashscreentitle' style="margin-left:1vw; display: block;"></i></p>
@@ -236,7 +244,7 @@
                 onkeydown="keyPresedOnJotter(event);" spellcheck="false"></textarea>
         </form>
 
-        <p><button id="jottersavebutton" style="padding: .25rem;" type="button" onclick="saveJotter();">Save</button>
+        <p><button id="jottersavebutton" class = "babbutton"  type="button" onclick="saveJotter();">Save</button>
             <span id="savemessage" style="margin-left: 3vw; opacity: 0.5;"></span>
         </p>
     </div>
@@ -287,10 +295,10 @@
                 border-width: thin;
                 padding: 5px;
                 justify-content: space-around;">
-            <div><button onclick="insertNote('note')" type="button">Save as Note</button></div>
-            <div><button onclick="insertNote('query')" type="button">Save as Query</button>
+            <div><button class = "babbutton" onclick="insertNote('note')" type="button">Save as Note</button></div>
+            <div><button class = "babbutton" onclick="insertNote('query')" type="button">Save as Query</button>
             </div>
-            <div><button onclick="setActivityPanelToString('');" type="button">Cancel</button></div>
+            <div><button class = "babbutton" onclick="setActivityPanelToString('');" type="button">Cancel</button></div>
         </div><br>
     </span>
 
@@ -298,9 +306,10 @@
 
     <span id='editnotepanel' style='display: none;'>
         <div style='margin: 20px auto; text-align: center;'>
-            <button id='enBiteButton' type='button'>Play Again</button>
+            <button id='enBiteButton' class = "babbutton" type='button'>Play Again</button>
         </div>
-        <textarea id='enotetext' rows='4' cols='50' name='ecnotetext' style='margin: 5px auto; display: block;'>
+        <textarea id='enotetext' rows='4' cols='50' name='ecnotetext' style='margin: 5px auto; display: block;'
+            onkeydown="document.getElementById('saveeditednotebutton').style.background = 'pink';">
         </textarea>
         <div style='
                     display: flex;
@@ -310,7 +319,7 @@
                     width: 15%;
                     padding: 5px;
                     justify-content: center;'>
-            <button id="saveeditednotebutton" title='Save edited Note' type='button'>Save</button>
+            <button id="saveeditednotebutton" class = "babbutton" title='Save edited Note' type='button'>Save</button>
         </div>
         <div style='
                     display: flex;
@@ -321,12 +330,12 @@
                     padding: 5px;
                     justify-content: space-around;'>
 
-            <button id='changetoquerybutton' style='display: none;' title='Change note type to "Query"' type='button'>
+            <button id='changetoquerybutton' class = "babbutton" style='display: none;' title='Change note type to "Query"' type='button'>
                 Re-save as Query</button>
-            <button id='changetonotebutton' style='display: none;' title='Change note type to "Note"' type='button'>
+            <button id='changetonotebutton' class = "babbutton" style='display: none;' title='Change note type to "Note"' type='button'>
                 Re-save as Note</button>
-            <button id='deletenotebutton' title='Delete Note' type='button'>Delete</button>
-            <button type='button' onclick='setActivityPanelToString("");'>Cancel</button>
+            <button id='deletenotebutton' class = "babbutton" title='Delete Note' type='button'>Delete</button>
+            <button type='button' class = "babbutton" onclick='setActivityPanelToString("");'>Cancel</button>
         </div>
     </span>
 
@@ -338,7 +347,7 @@
                 onKeyPress="trackSearchStringEntry(event)">
         </p>
         <p>
-            <button id="searchbutton" type="button" onclick="searchTextsAndNotes()">Launch
+            <button id="searchbutton" class = "babbutton" type="button" onclick="searchTextsAndNotes()">Launch
                 Search</button>&nbsp;&nbsp;&nbsp;
         </p>
     </div>
@@ -508,7 +517,7 @@
             // fade the fugitive buttons by triggering a transition
             fadeButtonDiv('buttondiv1');
             fadeButtonDiv('buttondiv2');
-    
+
             buildProgrammePicklists(currentSeriesNum, currentEpisodeNam);
 
             buildScreenForCurrentEpisode();
@@ -595,12 +604,12 @@
 
             duration = timeToSeconds(currentEpisodeFinishTime);
 
-                document.getElementById('finishtime').innerHTML = formatTime(duration);
-                document.getElementById('seriesnum').innerHTML = currentSeriesNum;
-                document.getElementById('episodenam').innerHTML = currentEpisodeNam;
-                document.getElementById('firstondate').innerHTML = currentFirstOnDate;
-                document.getElementById('learneroftheweek').innerHTML = currentLearnerOfTheWeek;
-                document.getElementById("dictionarypref").textContent = currentDictionaryPref;
+            document.getElementById('finishtime').innerHTML = formatTime(duration);
+            document.getElementById('seriesnum').innerHTML = currentSeriesNum;
+            document.getElementById('episodenam').innerHTML = currentEpisodeNam;
+            document.getElementById('firstondate').innerHTML = currentFirstOnDate;
+            document.getElementById('learneroftheweek').innerHTML = currentLearnerOfTheWeek;
+            document.getElementById("dictionarypref").textContent = currentDictionaryPref;
 
             // get the pixel widths of the playline and playhead - these are key parameter
             // used throughout the rest of the layout, determining the absolute position of
@@ -713,6 +722,8 @@
             var noteProgrammeKey = currentSeriesNum + "%" + currentEpisodeNam;
             const noteObjects = await db.getAllFromIndex('notes', 'notes_by_programme_path', noteProgrammeKey);
 
+            var noteLine = '';
+
             if (noteObjects != undefined) {
 
                 for (var i = 0; i < noteObjects.length; i++) {
@@ -727,14 +738,20 @@
                     var marginLeft = (secondsIntoProgramme * scaleFactor) + scaleCorrectionForNote;
                     var noteTextStub = noteText.substring(0, 15) + ' ...';
 
-                    document.getElementById('notes').innerHTML += "\
-                <a id='n" + secondsIntoProgramme + "'\
-                    style='position:absolute; margin-left: " + marginLeft + "px; cursor: pointer;' \
-                    title='" + noteTextStub + "'\
-                    onclick = 'displayEditNotePanel(\"n" + secondsIntoProgramme + "\");'>\
-                    <img class='notemark' src='https://ngatesystems.com/beagairbheag/img/notemarkblack.png'>\
-                </a>";
+                    noteLine += "\
+                    <a id='n" + secondsIntoProgramme + "'\
+                        style='position:absolute; margin-left: " + marginLeft + "px; cursor: pointer;' \
+                        title='" + noteTextStub + "'\
+                        onclick = 'displayEditNotePanel(\"n" + secondsIntoProgramme + "\");'>";
+
+                    if (noteType === "note") {
+                        noteLine += "<img class='notemark' src='https://ngatesystems.com/beagairbheag/img/notemarkblack.png'></a>";
+                    } else {
+                        noteLine += "<img class='notemark' src='https://ngatesystems.com/beagairbheag/img/notemarkred.png'></a>";
+                    }
+
                 }
+                document.getElementById('notes').innerHTML = noteLine;
             }
         }
 
@@ -774,7 +791,7 @@
                 return;
             }
 
-            var noteText = decodeURI(document.getElementById('cnotetext').value);
+            var noteText = document.getElementById('cnotetext').value;
             var postTimeAsInteger = Math.floor(postTime);
 
             // noteKey is constructed from the following four components: 
@@ -784,8 +801,7 @@
             var noteKey = currentSeriesNum + "%" + currentEpisodeNam + "%" + postTimeAsInteger;
             var noteProgrammeKey = currentSeriesNum + "%" + currentEpisodeNam;
 
-            // encode note text because ' and " characters in the text will confuse javascript
-            var noteObject = { 'notekey': noteKey, 'noteprogrammekey': noteProgrammeKey, 'notetext': encodeURI(noteText), 'notetype': noteType };
+            var noteObject = { 'notekey': noteKey, 'noteprogrammekey': noteProgrammeKey, 'notetext': noteText, 'notetype': noteType };
 
             // Add the note in a transaction so we can check everything works
             const db = await idb.openDB('BaB', 1);
@@ -824,9 +840,9 @@
             var onclickLink = "displayEditNotePanel('n" + postTimeAsInteger + "')";
             newNote.setAttribute("onclick", onclickLink);
 
-            // and finally, add the new <a> element into the DOM as a child of the 'textline' div
+            // and finally, add the new <a> element into the DOM as a child of the 'notes' div
 
-            document.getElementById('noteline').appendChild(newNote);
+            document.getElementById('notes').appendChild(newNote);
 
             // display an "OK" message in activitypanel
 
@@ -848,7 +864,7 @@
 
             setActivityPanelToElement('editnotepanel');
 
-            document.getElementById('enotetext').value = decodeURI(noteObject.notetext);
+            document.getElementById('enotetext').value = noteObject.notetext;
             document.getElementById('enotetext').focus();
 
             document.getElementById('saveeditednotebutton').onclick = function () { editNote(noteId, noteObject.notetype) };
@@ -866,10 +882,12 @@
 
         async function editNote(noteId, noteType) {
 
+            document.getElementById('saveeditednotebutton').style.background = 'initial';
+
             // replace the text and type of the note at noteId for the current 
             // series and episode in the notes datastore
 
-            var noteText = encodeURI(document.getElementById('enotetext').value)
+            var noteText = document.getElementById('enotetext').value;
             var secondsIntoProgramme = noteId.substring(1);
 
             var noteKey = currentSeriesNum + "%" + currentEpisodeNam + "%" + secondsIntoProgramme;
@@ -894,13 +912,21 @@
 
             if (noteType === "note") {
                 document.getElementById(noteId).innerHTML = "<img class='notemark' src='https://ngatesystems.com/beagairbheag/img/notemarkblack.png'>";
+                document.getElementById('saveeditednotebutton').onclick = function () { editNote(noteId, "note") };
+                document.getElementById('changetoquerybutton').style.display = 'block';
+                document.getElementById('changetonotebutton').style.display = 'none';
+                document.getElementById('changetoquerybutton').onclick = function () { editNote(noteId, "query") };
             } else {
                 document.getElementById(noteId).innerHTML = "<img class='notemark' src='https://ngatesystems.com/beagairbheag/img/notemarkred.png'>";
+                document.getElementById('saveeditednotebutton').onclick = function () { editNote(noteId, "query") };
+                document.getElementById('changetonotebutton').style.display = 'block';
+                document.getElementById('changetoquerybutton').style.display = 'none';
+                document.getElementById('changetonotebutton').onclick = function () { editNote(noteId, "note") };
             }
 
             // ditto the title
 
-            var noteTextStub = decodeURI(document.getElementById('enotetext').value).substr(0.15) + " ...";
+            var noteTextStub = document.getElementById('enotetext').value.substr(0.15) + " ...";
             document.getElementById(noteId).title = noteTextStub;
 
             document.getElementById('deletenotebutton').onclick = function () { deleteNote(noteId) };
@@ -1111,8 +1137,6 @@
 
             if (searchWord) {
 
-                searchWord = encodeURIComponent(searchWord)
-
                 // this seemed originally to be set to target the mobile(?) version of afb - note have changed to https now from very first version of this code
                 // In March 2019 started to get "asynchronous op denied" error msg. Found that could fall back to the main version.
                 // var DictionaryWindow = window.open("https://www.faclair.com/mm/index.aspx?txtSearch=" + searchWord, "AFB", "width=500, height=600, resizable=1, menubar=no, scrollbars=1, status=1, titlebar=1, toolbar=no, location=no, personalbar=1");
@@ -1314,7 +1338,7 @@
 
 
                         var highlightedTextBlock = textBlock.replace(searchRegex, '<b style ="color: red;">$&</b>');
-                        results += "<span>... " + decodeURI(highlightedTextBlock) + " ...</span><br><br>";
+                        results += "<span>... " + highlightedTextBlock + " ...</span><br><br>";
                     }
                 }
 
@@ -1333,8 +1357,7 @@
 
         async function displayJotter() {
 
-            // retrieve the user's jotter and reveal the jotterdiv to display it
-            // above the main display
+            // retrieve the user's jotter and reveal the jotterdiv as a popup above the main display
 
             const db = await idb.openDB('BaB', 1);
 
@@ -1345,7 +1368,7 @@
             // reveal a popup window to display the jotter;
 
             document.getElementById('jotterdiv').style.display = "block";
-            document.getElementById('userjotter').value = decodeURI(jotterObject.text);
+            document.getElementById('userjotter').value = jotterObject.text;
             document.getElementById('userjotter').placeholder = jotterObject.text;
             document.getElementById('userjotter').focus();
             isCtrl = false;
@@ -1369,9 +1392,9 @@
 
         async function saveJotter() {
 
-            // save the user jotter - encode the text because any ' and " characters will confuse javascript
+            // save the user jotter
 
-            var jotterObject = { 'jotterkey': 'user', 'text': encodeURI(document.getElementById('userjotter').value) };
+            var jotterObject = { 'jotterkey': 'user', 'text': document.getElementById('userjotter').value };
 
             // Add the jotter in a transaction so we can check everything works
             const db = await idb.openDB('BaB', 1);
@@ -1409,7 +1432,7 @@
             userJotterChanged = true;
             isCtrl = false;
             jottersavebutton.style.opacity = 1.0;
-            jottersavebutton.style.background = "red";
+            jottersavebutton.style.background = "pink";
 
         }
 
@@ -1564,7 +1587,7 @@
 
                     {
                         const tx = db.transaction('jotter', 'readwrite');
-                        var jotterObject = { 'jotterkey': 'user', 'text': encodeURI(jotter) };
+                        var jotterObject = { 'jotterkey': 'user', 'text': jotter };
 
                         try {
                             await Promise.all([

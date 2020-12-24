@@ -85,8 +85,7 @@ if ($helper_type == "build_programme_picklists") {
 
     $returns = array();
     $returns['seriespicklist'] = "<select id='seriespicklist' size='1'
-                                        onchange = 'changeSeries();'>
-                                        <option value='undefined'></option>";
+                                        onchange = 'changeSeries();'>";
 
     $sql = "SELECT DISTINCT series_num FROM programmes
             ORDER BY series_num DESC;";
@@ -103,8 +102,7 @@ if ($helper_type == "build_programme_picklists") {
     }
 
     $returns['episodepicklist'] = "<select id='episodepicklist' size='1'
-                                        onchange = 'changeEpisode();'>
-                                     <option value='undefined'></option>";
+                                        onchange = 'changeEpisode();'>";
 
     // order by episode_nam doesn't work as "episode 10" sorts before "episode 2". Use "firston_datestring" instead
 
