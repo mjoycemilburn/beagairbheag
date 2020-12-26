@@ -80,7 +80,7 @@
                     title="Click to open your Jotter" onclick="displayJotter();">
                 <img class="fugitivebutton" src="https://ngatesystems.com/beagairbheag/img/ggllaunch.svg"
                     title="Click to open the Google Translator"
-                    onclick="displayPopupWindow('https://translate.google.com/?sl=gd&tl=enL');">
+                    onclick="event.stopPropagation(); displayPopupWindow('https://translate.google.com/?sl=gd&tl=enL');">
             </div>
 
             <div style="height:4vw; margin: 2vw;  border-style: solid;border-width: thin;">
@@ -112,9 +112,9 @@
                 <img class="fugitivebutton" src="https://ngatesystems.com/beagairbheag/img/backup.svg?"
                     title="Copy your jotter and notes to local storage" onclick="backupDataStores();">
                 <img class="fugitivebutton" src="https://ngatesystems.com/beagairbheag/img/restore.svg?"
-                    title="Restore your jotter and notes from local backup filesf" onclick="uploadBackupFile();">
+                    title="Restore your jotter and notes from local backup filesf" onclick="event.stopPropagation(); uploadBackupFile();">
                 <img class="fugitivebutton" src="https://ngatesystems.com/beagairbheag/img/mark.svg?"
-                    title="Click for Colin Mark Translations Workshops" onclick="displayColinMarkWindow();">
+                    title="Click for Colin Mark Translations Workshops" onclick="event.stopPropagation(); displayColinMarkWindow(event);">
             </div>
         </div>
 
@@ -129,9 +129,9 @@
                     border: solid;">
 
             <!-- Display an empty noteline - we'll fill this in dynamically later-->
-            <div id="noteline" style="height: 3vh; margin-top: .5vh;">
+            <div id="noteline" style="height: 3vh; margin-top: .5vh; background: whitesmoke;">
                 <a id="nsample" style="position:absolute; margin-left: 0px;">
-                    <img class="notemark" src="https://ngatesystems.com/beagairbheag/img/notemarkblack.png"></a>
+                    <img class="notemark" src="https://ngatesystems.com/beagairbheag/img/notemarkblack.svg"></a>
                 <div id="notes"></div>
             </div>
 
@@ -745,9 +745,9 @@
                         onclick = 'displayEditNotePanel(\"n" + secondsIntoProgramme + "\");'>";
 
                     if (noteType === "note") {
-                        noteLine += "<img class='notemark' src='https://ngatesystems.com/beagairbheag/img/notemarkblack.png'></a>";
+                        noteLine += "<img class='notemark' src='https://ngatesystems.com/beagairbheag/img/notemarkblack.svg'></a>";
                     } else {
-                        noteLine += "<img class='notemark' src='https://ngatesystems.com/beagairbheag/img/notemarkred.png'></a>";
+                        noteLine += "<img class='notemark' src='https://ngatesystems.com/beagairbheag/img/notemarkred.svg'></a>";
                     }
 
                 }
@@ -821,9 +821,9 @@
             // first as an empty <a> element, declare its innerhtml and then add its properties
 
             if (noteType === "note") {
-                var noteInnerHTML = "<img class='notemark' src='https://ngatesystems.com/beagairbheag/img/notemarkblack.png'></a>";
+                var noteInnerHTML = "<img class='notemark' src='https://ngatesystems.com/beagairbheag/img/notemarkblack.svg'></a>";
             } else {
-                var noteInnerHTML = "<img class='notemark' src='https://ngatesystems.com/beagairbheag/img/notemarkred.png'></a>";
+                var noteInnerHTML = "<img class='notemark' src='https://ngatesystems.com/beagairbheag/img/notemarkred.svg'></a>";
             }
 
             var newNote = document.createElement("a");  // create a new <a> element
@@ -911,13 +911,13 @@
             // set the note icon note_type in case it has changed
 
             if (noteType === "note") {
-                document.getElementById(noteId).innerHTML = "<img class='notemark' src='https://ngatesystems.com/beagairbheag/img/notemarkblack.png'>";
+                document.getElementById(noteId).innerHTML = "<img class='notemark' src='https://ngatesystems.com/beagairbheag/img/notemarkblack.svg'>";
                 document.getElementById('saveeditednotebutton').onclick = function () { editNote(noteId, "note") };
                 document.getElementById('changetoquerybutton').style.display = 'block';
                 document.getElementById('changetonotebutton').style.display = 'none';
                 document.getElementById('changetoquerybutton').onclick = function () { editNote(noteId, "query") };
             } else {
-                document.getElementById(noteId).innerHTML = "<img class='notemark' src='https://ngatesystems.com/beagairbheag/img/notemarkred.png'>";
+                document.getElementById(noteId).innerHTML = "<img class='notemark' src='https://ngatesystems.com/beagairbheag/img/notemarkred.svg'>";
                 document.getElementById('saveeditednotebutton').onclick = function () { editNote(noteId, "query") };
                 document.getElementById('changetonotebutton').style.display = 'block';
                 document.getElementById('changetoquerybutton').style.display = 'none';
@@ -1654,8 +1654,6 @@
             var popupTop = 0.5 * (window.innerHeight - popupHeight);
 
             var popupSpecs = "width=" + popupWidth + ", height=" + popupHeight + ", left=" + popupLeft + ", top=" + popupTop + "t, resizable = yes, scrollbars = yes ";
-
-            event.stopPropagation(); // make sure we don't triggger the window click we set up later
 
             var popUpWindow = window.open(url, "popUpWindow", popupSpecs);
 
