@@ -45,12 +45,13 @@
             cursor: pointer;
         }
 
-                .babbutton {
+        .babbutton {
             padding: .25rem;
             font: larger;
-            background-color:aquamarine;
+            background-color: aquamarine;
             border: 1px solid black;
             border-radius: 4px;
+            cursor: pointer;
         }
     </style>
 
@@ -112,9 +113,11 @@
                 <img class="fugitivebutton" src="https://ngatesystems.com/beagairbheag/img/backup.svg?"
                     title="Copy your jotter and notes to local storage" onclick="backupDataStores();">
                 <img class="fugitivebutton" src="https://ngatesystems.com/beagairbheag/img/restore.svg?"
-                    title="Restore your jotter and notes from local backup filesf" onclick="event.stopPropagation(); uploadBackupFile();">
+                    title="Restore your jotter and notes from local backup filesf"
+                    onclick="event.stopPropagation(); uploadBackupFile();">
                 <img class="fugitivebutton" src="https://ngatesystems.com/beagairbheag/img/mark.svg?"
-                    title="Click for Colin Mark Translations Workshops" onclick="event.stopPropagation(); displayColinMarkWindow(event);">
+                    title="Click for Colin Mark Translations Workshops"
+                    onclick="event.stopPropagation(); displayColinMarkWindow(event);">
             </div>
         </div>
 
@@ -179,11 +182,12 @@
                     <img id="logo" style="max-width:100%;" src="https://ngatesystems.com/beagairbheag/img/logo.png"
                         alt="Beag Air Bheag Companion logo">
                     <p></p>
-                    <div style="margin-top: 10px; text-align: center;">
-                        <button class = "babbutton" onclick="setActivityPanelToString(about);" type="button"
+                    <div style="margin-top: 10px;">
+                        <button class="babbutton" onclick="setActivityPanelToString(about);" type="button"
                             title="About the Companion">About
                         </button>&nbsp;&nbsp;&nbsp;
-                        <button class = "babbutton" onclick="setActivityPanelToString(hints);" type="button" title="Click for Hints">Hints
+                        <button class="babbutton" onclick="setActivityPanelToString(hints);" type="button"
+                            title="Click for Hints">Hints
                         </button>
                     </div>
                 </div>
@@ -219,8 +223,8 @@
                 <p><strong>Want a different programme? </strong></p>
                 <p>Series <span id="seriespicklistcontainer"></span> : <span id="episodepicklistcontainer"></span></p>
                 <br>
-                <p>Current dictionary : <button id="dictionarypref"  class = "babbutton" title="Toggle text look-up dictionary"
-                        onclick="toggleDictionaryPref()"></button></p>
+                <p>Current dictionary : <button id="dictionarypref" class="babbutton"
+                        title="Toggle text look-up dictionary" onclick="toggleDictionaryPref()"></button></p>
                 <p id="currentsplashscreen">Current splash-screen:<br>
                     <i id='splashscreentitle' style="margin-left:1vw; display: block;"></i></p>
 
@@ -244,7 +248,7 @@
                 onkeydown="keyPresedOnJotter(event);" spellcheck="false"></textarea>
         </form>
 
-        <p><button id="jottersavebutton" class = "babbutton"  type="button" onclick="saveJotter();">Save</button>
+        <p><button id="jottersavebutton" class="babbutton" type="button" onclick="saveJotter();">Save</button>
             <span id="savemessage" style="margin-left: 3vw; opacity: 0.5;"></span>
         </p>
     </div>
@@ -295,10 +299,10 @@
                 border-width: thin;
                 padding: 5px;
                 justify-content: space-around;">
-            <div><button class = "babbutton" onclick="insertNote('note')" type="button">Save as Note</button></div>
-            <div><button class = "babbutton" onclick="insertNote('query')" type="button">Save as Query</button>
+            <div><button class="babbutton" onclick="insertNote('note')" type="button">Save as Note</button></div>
+            <div><button class="babbutton" onclick="insertNote('query')" type="button">Save as Query</button>
             </div>
-            <div><button class = "babbutton" onclick="setActivityPanelToString('');" type="button">Cancel</button></div>
+            <div><button class="babbutton" onclick="setActivityPanelToString('');" type="button">Cancel</button></div>
         </div><br>
     </span>
 
@@ -306,7 +310,7 @@
 
     <span id='editnotepanel' style='display: none;'>
         <div style='margin: 20px auto; text-align: center;'>
-            <button id='enBiteButton' class = "babbutton" type='button'>Play Again</button>
+            <button id='enBiteButton' class="babbutton" type='button'>Play Again</button>
         </div>
         <textarea id='enotetext' rows='4' cols='50' name='ecnotetext' style='margin: 5px auto; display: block;'
             onkeydown="document.getElementById('saveeditednotebutton').style.background = 'pink';">
@@ -319,7 +323,7 @@
                     width: 15%;
                     padding: 5px;
                     justify-content: center;'>
-            <button id="saveeditednotebutton" class = "babbutton" title='Save edited Note' type='button'>Save</button>
+            <button id="saveeditednotebutton" class="babbutton" title='Save edited Note' type='button'>Save</button>
         </div>
         <div style='
                     display: flex;
@@ -330,12 +334,14 @@
                     padding: 5px;
                     justify-content: space-around;'>
 
-            <button id='changetoquerybutton' class = "babbutton" style='display: none;' title='Change note type to "Query"' type='button'>
+            <button id='changetoquerybutton' class="babbutton" style='display: none;'
+                title='Change note type to "Query"' type='button'>
                 Re-save as Query</button>
-            <button id='changetonotebutton' class = "babbutton" style='display: none;' title='Change note type to "Note"' type='button'>
+            <button id='changetonotebutton' class="babbutton" style='display: none;' title='Change note type to "Note"'
+                type='button'>
                 Re-save as Note</button>
-            <button id='deletenotebutton' class = "babbutton" title='Delete Note' type='button'>Delete</button>
-            <button type='button' class = "babbutton" onclick='setActivityPanelToString("");'>Cancel</button>
+            <button id='deletenotebutton' class="babbutton" title='Delete Note' type='button'>Delete</button>
+            <button type='button' class="babbutton" onclick='setActivityPanelToString("");'>Cancel</button>
         </div>
     </span>
 
@@ -347,7 +353,7 @@
                 onKeyPress="trackSearchStringEntry(event)">
         </p>
         <p>
-            <button id="searchbutton" class = "babbutton" type="button" onclick="searchTextsAndNotes()">Launch
+            <button id="searchbutton" class="babbutton" type="button" onclick="searchTextsAndNotes()">Launch
                 Search</button>&nbsp;&nbsp;&nbsp;
         </p>
     </div>
@@ -651,11 +657,11 @@
                         "<div style = 'color: red; overflow-y: auto;'>" + music.src +
                         "</div>" +
                         "<br><br>You need to download this podcast from its BBC " +
-                        "<a href = '" + currentBBCProgrammeUrl + "' target='_blank'>Programme Page</a>" +
+                        "<button class = 'babbutton' onclick = 'window.open(\"" + currentBBCProgrammeUrl + "\", \"_blank\");'>Programme Page</button>" +
                         " and wait for the file to appear fully in your download" +
-                        " folder. If you are using the Companion for the first time and your babindex.html" +
-                        " file is also still in your download folder, you should now be able to launch the" +
-                        " episode by simply clicking the 'Play' button." +
+                        " folder. If you are running the Companion from the download folder, you should now be able to launch the" +
+                        " episode by simply clicking the 'Play' button. Otherwise, you'll need to manually move" +
+                        " the downloaded file to the new babindex location first."
                         "</div>";
                     setActivityPanelToString(alertMessage);
                     audioExceptionMessageJustDisplayed = true;
