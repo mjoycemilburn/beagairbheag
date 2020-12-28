@@ -132,7 +132,8 @@
                     border: solid;">
 
             <!-- Display an empty noteline - we'll fill this in dynamically later-->
-            <div id="noteline" style="height: 3vh; margin-top: .5vh; background: whitesmoke;">
+            <div id="noteline" style="height: 3vh; margin-top: .5vh; background: whitesmoke;"
+                title="Marks on this line indicate the position of notes on the audio">
                 <a id="nsample" style="position:absolute; margin-left: 0px;">
                     <img class="notemark" src="https://ngatesystems.com/beagairbheag/img/notemarkblack.svg"></a>
                 <div id="notes"></div>
@@ -218,8 +219,8 @@
                 <p><strong>
                         Now Playing : Series <span id="seriesnum"></span> : <span id="episodenam"></strong>
                 </p>
-                <p>First broadcast : <span id="firstondate"></p>
-                <p>Learner of the Week : <span id="learneroftheweek"></p>
+                <p>First broadcast : <span id="firstondate"></span></p>
+                <p>Learner of the Week : <span id="learneroftheweek"></span></p>
                 <p><strong>Want a different programme? </strong></p>
                 <p>Series <span id="seriespicklistcontainer"></span> : <span id="episodepicklistcontainer"></span></p>
                 <br>
@@ -249,7 +250,7 @@
         </form>
 
         <p><button id="jottersavebutton" class="babbutton" type="button" onclick="saveJotter();">Save</button>
-            <span id="savemessage" style="margin-left: 3vw; opacity: 0.5;"></span>
+            <span id="savemessage" style="margin-left: 3vw;"></span>
         </p>
     </div>
 
@@ -279,7 +280,7 @@
             <div><button id="lBiteButton" title="Start the sound-bite one second ealier" onclick="playBiteNudgedLeft();"
                     type="button">Nudge L</button>
             </div>
-            <div><button id="pBiteButton" title="Play a four-second sound-bite centred on the current time"
+            <div><button id="pBiteButton" title="Play a five-second sound-bite centred on the current time"
                     onclick="postTime=music.currentTime; playBite();" type="button">Play</button>
             </div>
             <div><button id="rBiteButton" title="Start the sound-bite one second later" onclick="playBiteNudgedRight();"
@@ -289,7 +290,7 @@
 
         <p style="text-align: center">Note/Query text</p>
         <textarea id="cnotetext" rows="4" cols="50" style="margin: 5px auto; display: block;" name="cnotetext"
-            title="Notes on sound - eg \'jay hoorshht e\' = dè thuirt e : what did he say?"></textarea>
+            title="Notes on sound - eg 'jay hoorshht e' = dè thuirt e : what did he say?"></textarea>
 
         <div style="
                 display: flex;
@@ -310,7 +311,8 @@
 
     <span id='editnotepanel' style='display: none;'>
         <div style='margin: 20px auto; text-align: center;'>
-            <button id='enBiteButton' class="babbutton" type='button'>Play Again</button>
+            <button id='enBiteButton' class="babbutton" type='button' title="Replay the five-second sound-bite centred on this note"
+                        onclick="playBiteInEditPanel();">Play Again</button>
         </div>
         <textarea id='enotetext' rows='4' cols='50' name='ecnotetext' style='margin: 5px auto; display: block;'
             onkeydown="document.getElementById('saveeditednotebutton').style.background = 'pink';">
@@ -662,7 +664,7 @@
                         " folder. If you are running the Companion from the download folder, you should now be able to launch the" +
                         " episode by simply clicking the 'Play' button. Otherwise, you'll need to manually move" +
                         " the downloaded file to the new babindex location first."
-                        "</div>";
+                    "</div>";
                     setActivityPanelToString(alertMessage);
                     audioExceptionMessageJustDisplayed = true;
                 }
@@ -742,7 +744,8 @@
                     var noteType = noteObjects[i].notetype;
 
                     var marginLeft = (secondsIntoProgramme * scaleFactor) + scaleCorrectionForNote;
-                    var noteTextStub = noteText.substring(0, 15) + ' ...';
+                    var noteTextStub = noteText;
+                    if (noteText.length > 15) noteTextStub = noteText.substring(0, 15) + ' ...';
 
                     noteLine += "\
                     <a id='n" + secondsIntoProgramme + "'\
@@ -859,7 +862,9 @@
 
         async function displayEditNotePanel(noteId) {
 
-            var secondsIntoProgramme = noteId.substring(1);
+            var secondsIntoProgramme = parseInt(noteId.substring(1));
+            postTime = secondsIntoProgramme;
+            playBiteInEditPanel();
 
             // retrieve the note from notestore
 
@@ -894,7 +899,7 @@
             // series and episode in the notes datastore
 
             var noteText = document.getElementById('enotetext').value;
-            var secondsIntoProgramme = noteId.substring(1);
+            var secondsIntoProgramme = parseInt(noteId.substring(1));;
 
             var noteKey = currentSeriesNum + "%" + currentEpisodeNam + "%" + secondsIntoProgramme;
             var noteProgrammeKey = currentSeriesNum + "%" + currentEpisodeNam;
@@ -932,7 +937,8 @@
 
             // ditto the title
 
-            var noteTextStub = document.getElementById('enotetext').value.substr(0.15) + " ...";
+            var noteTextStub = document.getElementById('enotetext').value;
+            if (noteText.length > 15) noteTextStub = noteText.substring(0, 15) + ' ...';
             document.getElementById(noteId).title = noteTextStub;
 
             document.getElementById('deletenotebutton').onclick = function () { deleteNote(noteId) };
@@ -941,7 +947,7 @@
 
         async function deleteNote(noteId) {
 
-            var secondsIntoProgramme = noteId.substring(1);
+            var secondsIntoProgramme = parseInt(noteId.substring(1));
             var noteKey = currentSeriesNum + "%" + currentEpisodeNam + "%" + secondsIntoProgramme;
 
             // Delete the note in a transaction so we can check everything works
@@ -1196,13 +1202,23 @@
                         var JSONString = xmlDoc.getElementsByTagName("returns")[0].childNodes[0].nodeValue;
                         var JSONObject = JSON.parse(JSONString);
 
-                        currentFirstOnDate = JSONObject.currentFirstOnDate;
                         currentEpisodeFinishTime = JSONObject.currentEpisodeFinishTime;
+                        currentFirstOnDate = JSONObject.currentFirstOnDate;
                         currentLearnerOfTheWeek = JSONObject.currentLearnerOfTheWeek;
                         currentBBCProgrammeUrl = JSONObject.currentBBCProgrammeUrl;
-                        currentBBCDownloadFilename = JSONObject.audiofilename;
                         currentSplashScreenFilename = JSONObject.currentSplashScreenFilename;
                         currentSplashScreenTitle = JSONObject.currentSplashScreenTitle;
+                        currentBBCDownloadFilename = JSONObject.audiofilename;
+
+                        localStorage.setItem('lastSeriesNum', currentSeriesNum);
+                        localStorage.setItem('lastEpisodeNam', currentEpisodeNam);
+                        localStorage.setItem('lastEpisodeFinishTime', currentEpisodeFinishTime);
+                        localStorage.setItem('lastFirstOnDate', currentFirstOnDate);
+                        localStorage.setItem('lastLearnerOfTheWeek', currentLearnerOfTheWeek);
+                        localStorage.setItem('lastBBCProgrammeUrl', currentBBCProgrammeUrl);
+                        localStorage.setItem('lastSplashScreenFilename', currentSplashScreenFilename);
+                        localStorage.setItem('lastSplashScreenTitle', currentSplashScreenTitle);
+                        localStorage.setItem('lastBBCDownloadFilename', currentBBCDownloadFilename);
 
                         buildScreenForCurrentEpisode();
 
@@ -1287,7 +1303,7 @@
                     // rows(one each for title and text - content) that display the match centred in a block of 30 characters 
                     // with html that will display the text itself if either of the rows is clicked
 
-                    results += "<span onclick = 'displayTextSource(\"" + texts[i].textkey + "\", \"\", \"" + textHeader + "\", \"" + searchString + "\");'>... " + searchTextHeading + " ...</span><br>"
+                    results += "<span style = 'cursor: pointer;' onclick = 'displayTextSource(\"" + texts[i].textkey + "\", \"\", \"" + textHeader + "\", \"" + searchString + "\");'>... " + searchTextHeading + " ...</span><br>"
                     var start = Math.max(0, pos - 15);
                     var finish = Math.min(strippedText.length, pos + 30);
                     var textBlock = strippedText.substring(start, finish)
@@ -1303,7 +1319,7 @@
                         "<span style = 'color: red; font-weight:bold;'>" + textBlock.substring(posInTextBlock, posInTextBlock + searchString.length) + "</span>" +
                         textBlock.substring(posInTextBlock + searchString.length, textBlock.length);
 
-                    results += "<span onclick = 'displayTextSource(\"" + texts[i].textkey + "\", \"\", \"" + textHeader + "\", \"" + searchString + "\");'>... " + textBlockWithHighlights + " ... <br><br></span>";
+                    results += "<span style = 'cursor: pointer;' onclick = 'displayTextSource(\"" + texts[i].textkey + "\", \"\", \"" + textHeader + "\", \"" + searchString + "\");'>... " + textBlockWithHighlights + " ... <br><br></span>";
 
                 }
             }
@@ -1416,10 +1432,9 @@
                 }
             }
 
-            jottersavebutton.style.opacity = 0.5;
-            jottersavebutton.style.background = "white";
             isCtrl = false;
             userJotterChanged = false;
+            jottersavebutton.style.background = "aquamarine";
         }
 
         function keyPresedOnJotter(e) {
@@ -1437,7 +1452,6 @@
             }
             userJotterChanged = true;
             isCtrl = false;
-            jottersavebutton.style.opacity = 1.0;
             jottersavebutton.style.background = "pink";
 
         }
@@ -1871,7 +1885,7 @@
             // playhead (which is provided just as a more natural way of repositioning the playhead in a 
             // "closeup" situation) it seems best to pause the sound to avoid garbled noises. During this 
             // period we use "eventx" to pick up the physical position of the muse and actually turn off
-            // timeUpdate to avoid confusion. It gets restarted by mouseDownOnPlayhead
+            // timeUpdate to avoid confusion. It gets restarted by mouseUpOnPlayhead
 
             playline.addEventListener('pointermove', movePlayhead);
             music.removeEventListener("timeupdate", timeUpdate);
@@ -1880,7 +1894,7 @@
             // pause music while mousedown
             if (!music.paused) {
                 musicInterruptedByMouseDown = true;
-                pauseAudio
+                pauseAudio();
             }
         }
 
@@ -1891,7 +1905,7 @@
 
             if (clickOnPlayhead) {
                 playline.removeEventListener('pointermove', movePlayhead);
-                // music.addEventListener("timeupdate", timeUpdate);
+                music.addEventListener("timeupdate", timeUpdate);
                 clickOnPlayhead = false;
 
                 music.currentTime = duration * clickPercent(event);
@@ -1910,8 +1924,7 @@
 
             // move playhead using "Eventx" approach
             var newMargLeft = event.clientX - getPosition(playline) - 0.5 * playhead.offsetWidth;
-            console.log("In movePlayhead newMargLeft duration " + newMargLeft + " " + duration);
-            document.getElementById("currtime").innerHTML = "&nbsp;&nbsp;" + formatTime(Math.round(duration * clickPercent(event))) + "/" + formatTime(duration);
+            console.log("In movePlayhead newMargLeft duration click%" + newMargLeft + " " + duration + " " + clickPercent(event));
 
             if (newMargLeft >= 0 && newMargLeft <= playWidth) {
                 playhead.style.marginLeft = newMargLeft + "px";
@@ -1923,6 +1936,8 @@
                 playhead.style.marginLeft = playWidth + "px";
             }
 
+            document.getElementById("currtime").innerHTML = formatTime(Math.round(duration * clickPercent(event)));
+
             // recoverTextPanel();
         }
 
@@ -1932,6 +1947,7 @@
             // clientx gives the pixel position of the click event relative to the left
             // of the viewport
             var returnval = (event.clientX - position - 0.5 * headWidth) / (playWidth - headWidth);
+            if (returnval < 0) returnval = 0;
             return returnval;
         }
 
@@ -2001,7 +2017,6 @@
             if (!music.paused) {
                 // stop music
                 music.pause();
-                pButton.className = "play";
             }
             music.currentTime = postTime;
             document.getElementById("currtime").innerHTML = formatTime(Math.round(postTime));
@@ -2027,7 +2042,7 @@
         }
         function timeToSeconds(time) {
 
-            // convert a database coded "time" field (mmss) to econds
+            // convert a database coded "time" field (mmss) to seconds
 
             var timeSeconds = time % 100;
             var timeMinutes = (time - timeSeconds) / 100;
