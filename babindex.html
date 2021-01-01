@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description"
-        content="BeagAirBheag study toolkit: Player, Transcript viewer, Dictionary Links, Note faciity, Crib sheets" />
+        content="BeagAirBheag study toolkit: Player, Transcript viewer, Dictionary Links, Note faciities" />
     <meta name="keywords" content="beagairbheag" />
 
     <!-- indexedDb promises-version from https://github.com/jakearchibald/idb-->
@@ -70,9 +70,8 @@
         <div id="pageheader" style="display: flex;height: 100%;justify-content: space-between; text-align: center;">
 
             <!--    The controls are displayed centred between balancing banks of "fugitive" buttons. The idea is to avoid 
-                    cluttering the page- the buttons are only displayed when the mouse moves over them. The images are
-                    placed in permanent containers as mouseover does not work when a container is hidden
-                -->
+                    cluttering the page- the buttons are only displayed when the mouse moves over them. -->
+
             <div id='buttondiv1' style="opacity:1;" onmouseover="displayButtonDiv('buttondiv1');"
                 onmouseout="fadeButtonDiv('buttondiv1');">
                 <img class="fugitivebutton" src="https://ngatesystems.com/beagairbheag/img/txtsearch.svg"
@@ -156,15 +155,16 @@
                         background: black;"></div>
             </div>
 
-            <!-- And finally Text bar. Due to border-collapse this is the only way I could find to get
-                 a tiny gap between the playline and the text links below it -->
-            <div id="textline" style="height: 4vh; margin-top: .25vh; margin-bottom: .25vh;">
+            <!-- And finally Text bar.  -->
+
+            <div id="textline" style="height:4vh; margin-top: 1vh; margin-bottom: 1vh;">
             </div>
         </div>
+
         <!-- ############  Panel Header - Logo panel, Activity panel and Episode panel ############# -->
 
         <!-- flex-grow is used here to allow the children divs of the panel header to occupy
-                     the remaining spae on the page without defininf height exlicitly -->
+                     the remaining space on the page without defining height exlicitly -->
 
         <div id="panelheader" style="
                     display:flex; 
@@ -183,7 +183,7 @@
                     <img id="logo" style="max-width:100%;" src="https://ngatesystems.com/beagairbheag/img/logo.png"
                         alt="Beag Air Bheag Companion logo">
                     <p></p>
-                    <div style="margin-top: 10px;">
+                    <div style="margin-top: 1vh; margin-left: 1vw;">
                         <button class="babbutton" onclick="setActivityPanelToString(about);" type="button"
                             title="About the Companion">About
                         </button>&nbsp;&nbsp;&nbsp;
@@ -224,7 +224,7 @@
                 <p><strong>Want a different programme? </strong></p>
                 <p>Series <span id="seriespicklistcontainer"></span> : <span id="episodepicklistcontainer"></span></p>
                 <br>
-                <p>Current dictionary : <button id="dictionarypref" class="babbutton"
+                <p>Current dictionary :&nbsp;&nbsp;<button id="dictionarypref" class="babbutton"
                         title="Toggle text look-up dictionary" onclick="toggleDictionaryPref()"></button></p>
                 <p id="currentsplashscreen">Current splash-screen:<br>
                     <i id='splashscreentitle' style="margin-left:1vw; display: block;"></i></p>
@@ -278,14 +278,11 @@
                 padding: 5px;
                 justify-content: space-around;">
             <div><button id="lBiteButton" title="Start the sound-bite one second ealier" onclick="playBiteNudgedLeft();"
-                    type="button">Nudge L</button>
-            </div>
+                    type="button">Nudge L</button></div>
             <div><button id="pBiteButton" title="Play a five-second sound-bite centred on the current time"
-                    onclick="postTime=music.currentTime; playBite();" type="button">Play</button>
-            </div>
+                    onclick="postTime=music.currentTime; playBite();" type="button">Play</button></div>
             <div><button id="rBiteButton" title="Start the sound-bite one second later" onclick="playBiteNudgedRight();"
-                    type="button">Nudge R</button>
-            </div>
+                    type="button">Nudge R</button></div>
         </div>
 
         <p style="text-align: center">Note/Query text</p>
@@ -301,8 +298,7 @@
                 padding: 5px;
                 justify-content: space-around;">
             <div><button class="babbutton" onclick="insertNote('note')" type="button">Save as Note</button></div>
-            <div><button class="babbutton" onclick="insertNote('query')" type="button">Save as Query</button>
-            </div>
+            <div><button class="babbutton" onclick="insertNote('query')" type="button">Save as Query</button></div>
             <div><button class="babbutton" onclick="setActivityPanelToString('');" type="button">Cancel</button></div>
         </div><br>
     </span>
@@ -352,12 +348,9 @@
     <div id="textsearchpanel" style="display: none; width: 25vw; padding: 2vw">
         <p> <label>Search for:</label>&nbsp;&nbsp;
             <input id="searchstring" type="text" name="search_words" title="Search string" autofocus size="24"
-                onKeyPress="trackSearchStringEntry(event)">
-        </p>
-        <p>
-            <button id="searchbutton" class="babbutton" type="button" onclick="searchTextsAndNotes()">Launch
-                Search</button>&nbsp;&nbsp;&nbsp;
-        </p>
+                onKeyPress="trackSearchStringEntry(event)"></p>
+        <p> <button id="searchbutton" class="babbutton" type="button" onclick="searchTextsAndNotes()">Launch
+                Search</button>&nbsp;&nbsp;&nbsp;</p>
     </div>
 
     <!-- utilities - empty form for the XMLHTTP PHP calls, "spinner for text loads and empty anchor for backup downloads -->
@@ -374,13 +367,13 @@
 
         var currentSystemVersionNumber = "1.00";
         var latestSystemVersionNumber;
-        var cryptography; // text for these elements will be served from ccentral source
+        var cryptography; // text for cryptography, about and hints will be served from central sources
         var about;
         var hints;
 
-        // The Companion uses numerous centrally-served .svg, .png, .php and .html elements. Although they are
-        // centraly-served, however, changing the server copy won't necessarily mean that a Copanion user will
-        // see the changes because the browser will use cached local copies until these become "stale" - which 
+        // The Companion uses numerous centrally-served .svg, .png, .php and .html elements. But changing the server
+        // copy won't necessarily mean that a Cmopanion user will see the changes because the browser
+        // will continue to use cached local copies until these become "stale" - which 
         // may take a few weeks. For php elements, the problem is side-stepped by "pre-staling" the code using
         // headers. For html elements, we fool the browser by adding a date-time "GET" parameter (they're called
         // so rarely that the associated inefficientcy is insignificant). The numerous graphic elements are a
@@ -389,7 +382,8 @@
 
         ///// Screen Management Scripts //////////
 
-        // Does local storage contain last programme details? - use localStorage.removeItem("lastSeriesNum") ; to clear this
+        // Does local storage contains 'last programme used' details? -  (use localStorage.removeItem("lastSeriesNum")
+        // to clear whn testing)
 
         if (localStorage.getItem('lastSeriesNum') === null) {
 
@@ -429,7 +423,7 @@
 
         var textTypesData; // global array of text-type data
 
-        // define startupSplashScreen
+        // define startupSplashScreen - you get this only when you use BaB for  the very first time
 
         var startupSplashScreenContent = " \
         <p style='text-align: center;'> \
@@ -570,7 +564,7 @@
             });
 
             // put an initial empty jotter record into the jotter store for key
-            // 'user' if this doesn't already exist
+            // 'user' if this doesn't already exist 
 
             {
                 const tx = db.transaction('jotter', 'readwrite');

@@ -20,7 +20,7 @@ Other features of the system are hidden in "fugitive buttons" that appear as ico
 
 1. A "Search" button that allows you to search for texts and notes for a particular text string.
 2. A "Jotter" button that opens a simple text editor to maintain a record of useful words and phrases. You could just use Windows Notepad or similar, of course, but experience shows that it's very handy to have this facility within the body of the application.
-3. a "Translate" button that opens Google's Gàidhlig translator. Use cut and paste to blast troublesome transcript sections straight into Google for explication.
+3. a "Translate" button that opens Google's Gàidhlig translator. Use cut and paste to blast troublesome transcript sections straight into Google's AI engine when you're desperate.
 4. Backup and Restore buttons that allow you to create local backup files for your notes and jotter - see "Architecture and Limitations", below. Backup files will appeear as (versioned) instances of a babbackup.txt file in your download folder.
 
 ## Architecture and Limitations
