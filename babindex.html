@@ -143,15 +143,14 @@
             <div id="playline" style="
                     width: 100%;
                     background: rgba(0,0,0,.3);
-                    margin-top: 2px;
-                    margin-bottom: 2px;
+                    margin-top: .5vh;
+                    margin-bottom: .5vh;
                     border-radius: 15px;">
                 <div id="playhead" style="
                         cursor: pointer;
                         width: 4vh;
                         height: 4vh;
                         border-radius: 50%;
-                        margin-top: 1px;
                         background: black;"></div>
             </div>
 
@@ -236,8 +235,8 @@
     <!-- hidden jotterdiv panel displayed as fixed-size "popup"  -->
 
     <div id="jotterdiv" style="
-                display: none; width: 80vw; height: 75vh;
-                position: absolute; margin-left: auto; margin-right: auto; left: 0; right: 0; top: 20px; 
+                display: none; width: 80%; height: 80%;
+                position: absolute; margin-left: auto; margin-right: auto; left: 0; right: 0; top: 5%; 
                 padding: 3vh 2vw 2vh 2vw; border: 1px solid black; 
                 background: white;
                 z-index: 10;" onclick="event.stopPropagation();">
@@ -257,8 +256,8 @@
     <!-- hidden zoomdiv panel displayed as fixed-size "popup"  -->
 
     <div id="zoomdiv" style="
-                        display: none; width: 80vw; height: 75vh;
-                        position: absolute; margin-left: auto; margin-right: auto; left: 0; right: 0; top: 20px; 
+                        display: none; width: 80%; height: 80%;
+                        position: absolute; margin-left: auto; margin-right: auto; left: 0; right: 0; top: 5%; 
                         padding: 1vh 2vw 1vh 2vw; border: 1px solid black; 
                         background: white;
                         text-align: center;
@@ -272,10 +271,10 @@
         <div style="
                 display: flex;
                 width: 60%;
-                margin: 20px auto;
+                margin: 5% auto;
                 border-style: solid;
                 border-width: thin;
-                padding: 5px;
+                padding: 1.5%;
                 justify-content: space-around;">
             <div><button id="lBiteButton" title="Start the sound-bite one second ealier" onclick="playBiteNudgedLeft();"
                     type="button">Nudge L</button></div>
@@ -292,10 +291,10 @@
         <div style="
                 display: flex;
                 width: 60%;
-                margin: 20px auto;
+                margin: 5% auto;
                 border-style: solid;
                 border-width: thin;
-                padding: 5px;
+                padding: 1.5%;
                 justify-content: space-around;">
             <div><button class="babbutton" onclick="insertNote('note')" type="button">Save as Note</button></div>
             <div><button class="babbutton" onclick="insertNote('query')" type="button">Save as Query</button></div>
@@ -317,19 +316,19 @@
                     display: flex;
                     border-style: solid;
                     border-width: thin;
-                    margin:  20px auto;
+                    margin:  5% auto;
                     width: 15%;
-                    padding: 5px;
+                    padding: 1.5%;
                     justify-content: center;'>
             <button id="saveeditednotebutton" class="babbutton" title='Save edited Note' type='button'>Save</button>
         </div>
         <div style='
                     display: flex;
                     width: 60%;
-                    margin: 20px auto;
+                    margin: 5% auto;
                     border-style: solid;
                     border-width: thin;
-                    padding: 5px;
+                    padding: 1.5%;
                     justify-content: space-around;'>
 
             <button id='changetoquerybutton' class="babbutton" style='display: none;'
