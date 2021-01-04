@@ -13,6 +13,8 @@
 
     <title>BeagAirBheag Companion</title>
 
+    <link rel="shortcut icon" href="https://ngatesystems.com/beagairbheag/bab.png">
+
     <style>
         .fugitivebutton {
             height: 4vw;
@@ -145,7 +147,8 @@
                     background: rgba(0,0,0,.3);
                     margin-top: .5vh;
                     margin-bottom: .5vh;
-                    border-radius: 15px;">
+                    border-radius: 999px;">
+                <!-- forces radius to be half the height-->
                 <div id="playhead" style="
                         cursor: pointer;
                         width: 4vh;
@@ -306,8 +309,9 @@
 
     <span id='editnotepanel' style='display: none;'>
         <div style='margin: 20px auto; text-align: center;'>
-            <button id='enBiteButton' class="babbutton" type='button' title="Replay the five-second sound-bite centred on this note"
-                        onclick="playBiteInEditPanel();">Play Again</button>
+            <button id='enBiteButton' class="babbutton" type='button'
+                title="Replay the five-second sound-bite centred on this note" onclick="playBiteInEditPanel();">Play
+                Again</button>
         </div>
         <textarea id='enotetext' rows='4' cols='50' name='ecnotetext' style='margin: 5px auto; display: block;'
             onkeydown="document.getElementById('saveeditednotebutton').style.background = 'pink';">
@@ -439,7 +443,7 @@
 
         window.onload = function () {
 
-            // get latest system version number
+            // get latest system version number - low priority asynch operation 
 
             var form1 = document.forms.namedItem("dummyform");
             var oData1 = new FormData(form1);
@@ -484,9 +488,7 @@
 
             oReq1.send(oData1);
 
-            // launch initialisation of textTypesData (header info) and while this is going on
-            // crack on with the initialisation of the screen (don't need actually need headers
-            // until we do text searches)
+            // launch initialisation of textTypesData (header info) - another pow priority asynch operation
 
             var form2 = document.forms.namedItem("dummyform");
             var oData2 = new FormData(form2);
@@ -519,12 +521,10 @@
             fadeButtonDiv('buttondiv1');
             fadeButtonDiv('buttondiv2');
 
+            // get the picklists and build the screen
+
             buildProgrammePicklists(currentSeriesNum, currentEpisodeNam);
 
-            buildScreenForCurrentEpisode();
-
-            if (currentSeriesNum != '') music.src = currentBBCDownloadFilename + ".mp3";
-            music.currentTime = 0;
         }
 
         async function initialiseIndexedDBStores() {
@@ -567,7 +567,7 @@
 
             {
                 const tx = db.transaction('jotter', 'readwrite');
-                var jotterObject = { 'jotterkey': 'user', 'jotter': '' };
+                var jotterObject = { 'jotterkey': 'user', 'text': '' };
                 try {
                     await Promise.all([
                         tx.store.add(jotterObject), // only a single store in play, so "store" references this automatically
@@ -582,6 +582,42 @@
                     }
                 }
             }
+        }
+
+        function buildProgrammePicklists(seriesNum, episodeNam) {
+
+            var form = document.forms.namedItem("dummyform");
+            var oData = new FormData(form);
+            oData.append("helper_type", "build_programme_picklists");
+            oData.append("series_num", seriesNum);
+            oData.append("episode_nam", episodeNam);
+            var oReq = new XMLHttpRequest();
+            oReq.open("POST", "https://ngatesystems.com/beagairbheag/php/player_helpers.php", true);
+            oReq.onload = function (oEvent) {
+                if (oReq.status == 200) {
+
+                    var response = oReq.responseText;
+                    if (response.indexOf("%failed%") != -1) {
+                        alert(response);
+                    } else {
+                        var xmlDoc = oReq.responseXML;
+                        var JSONString = xmlDoc.getElementsByTagName("returns")[0].childNodes[0].nodeValue;
+                        var JSONObject = JSON.parse(JSONString);
+
+                        seriesPicklist = JSONObject.seriespicklist;
+                        episodePicklist = JSONObject.episodepicklist;
+
+                        document.getElementById('seriespicklistcontainer').innerHTML = seriesPicklist;
+                        document.getElementById('episodepicklistcontainer').innerHTML = episodePicklist;
+
+                        buildScreenForCurrentEpisode();
+
+                        if (currentSeriesNum != '') music.src = currentBBCDownloadFilename + ".mp3";
+                        music.currentTime = 0;
+                    }
+                }
+            };
+            oReq.send(oData);
         }
 
         var audioExceptionMessageJustDisplayed = false;
@@ -646,18 +682,19 @@
             music.addEventListener('error', function (e) {
                 var noSourcesLoaded = (this.networkState === HTMLMediaElement.NETWORK_NO_SOURCE);
                 if (noSourcesLoaded) {
-                    var alertMessage =
-                        "<div style = 'text-align: center;'>" +
-                        "Oops - can't find your download file at : <br><br>" +
-                        "<div style = 'color: red; overflow-y: auto;'>" + music.src +
-                        "</div>" +
-                        "<br><br>You need to download this podcast from its BBC " +
-                        "<button class = 'babbutton' onclick = 'window.open(\"" + currentBBCProgrammeUrl + "\", \"_blank\");'>Programme Page</button>" +
-                        " and wait for the file to appear fully in your download" +
-                        " folder. If you are running the Companion from the download folder, you should now be able to launch the" +
-                        " episode by simply clicking the 'Play' button. Otherwise, you'll need to manually move" +
-                        " the downloaded file to the new babindex location first."
-                    "</div>";
+                    var alertMessage = "\
+                    <div style = 'text-align: center;'>\
+                        Oops - can't find your download file at : <br><br>\
+                        <div style = 'color: red; overflow-y: auto;'>" + music.src + "</div>\
+                        <br><br>You need to download this podcast from its BBC download page at :\
+                        <div style = 'margin-top: 2vh; margin-bottom: 2vh; text-align: center;'>\
+                            <button class = 'babbutton' onclick = 'window.open(\"" + currentBBCProgrammeUrl + "\", \"_blank\");'>BBC Download Page</button>" + "\
+                        </div>\
+                        and wait for the file to appear fully in your download folder. If you are\
+                        running the Companion from the download folder you should now be able to launch the\
+                        episode by simply clicking the 'Play' button. Otherwise you will first need to\
+                        move the downloaded file manually to the new babindex location.\
+                    </div>";
                     setActivityPanelToString(alertMessage);
                     audioExceptionMessageJustDisplayed = true;
                 }
@@ -677,37 +714,6 @@
             //set local storage
 
             localStorage.setItem('lastDictionaryPref', currentDictionaryPref);
-        }
-
-        function buildProgrammePicklists(seriesNum, episodeNam) {
-
-            var form = document.forms.namedItem("dummyform");
-            var oData = new FormData(form);
-            oData.append("helper_type", "build_programme_picklists");
-            oData.append("series_num", seriesNum);
-            oData.append("episode_nam", episodeNam);
-            var oReq = new XMLHttpRequest();
-            oReq.open("POST", "https://ngatesystems.com/beagairbheag/php/player_helpers.php", true);
-            oReq.onload = function (oEvent) {
-                if (oReq.status == 200) {
-
-                    var response = oReq.responseText;
-                    if (response.indexOf("%failed%") != -1) {
-                        alert(response);
-                    } else {
-                        var xmlDoc = oReq.responseXML;
-                        var JSONString = xmlDoc.getElementsByTagName("returns")[0].childNodes[0].nodeValue;
-                        var JSONObject = JSON.parse(JSONString);
-
-                        seriesPicklist = JSONObject.seriespicklist;
-                        episodePicklist = JSONObject.episodepicklist;
-
-                        document.getElementById('seriespicklistcontainer').innerHTML = seriesPicklist;
-                        document.getElementById('episodepicklistcontainer').innerHTML = episodePicklist;
-                    }
-                }
-            };
-            oReq.send(oData);
         }
 
         async function buildNoteline(seriesNum, episodeNam, scaleFactor, scaleCorrectionForNote) {
@@ -786,15 +792,15 @@
 
             // insert a note of the given type for the current series and episode into the notes datastore
 
-            var newnote = document.getElementById("n" + postTime);
+            var postTimeAsInteger = Math.floor(postTime);
+            var newnote = document.getElementById("n" + postTimeAsInteger);
 
-            if (typeof (newnote) === 'undefined' || typeof (newnote) === null) {
+            if (newnote != null) {
                 alert('Oops - there is already a note at this location!');
                 return;
             }
 
             var noteText = document.getElementById('cnotetext').value;
-            var postTimeAsInteger = Math.floor(postTime);
 
             // noteKey is constructed from the following four components: 
             // **  seriesNum, episodeNam, secondsIntoProgramme separated by % symbols **
@@ -848,7 +854,13 @@
 
             // display an "OK" message in activitypanel
 
-            var message = "<p style='margin-top:3vh; text-align: center; color: blue'><span>Note saved</span></p>";
+            if (noteType === "note") {
+                var noteDisplayType = "Note";
+            } else {
+                var noteDisplayType = "Query";
+            }
+
+            var message = "<p style='margin-top:3vh; text-align: center; color: blue'><span>" + noteDisplayType + " saved</span></p>";
             setActivityPanelToString(message);
 
         }
@@ -876,12 +888,13 @@
             if (noteObject.notetype === "note") {
                 document.getElementById('changetoquerybutton').style.display = 'block';
                 document.getElementById('changetoquerybutton').onclick = function () { editNote(noteId, "query") };
+                document.getElementById('deletenotebutton').onclick = function () { deleteNote(noteId, "note") };
             } else {
                 document.getElementById('changetonotebutton').style.display = 'block';
                 document.getElementById('changetonotebutton').onclick = function () { editNote(noteId, "note") };
-            }
-            document.getElementById('deletenotebutton').onclick = function () { deleteNote(noteId) };
+                document.getElementById('deletenotebutton').onclick = function () { deleteNote(noteId, "query") };
 
+            }
         }
 
         async function editNote(noteId, noteType) {
@@ -938,7 +951,7 @@
 
         }
 
-        async function deleteNote(noteId) {
+        async function deleteNote(noteId, noteType) {
 
             var secondsIntoProgramme = parseInt(noteId.substring(1));
             var noteKey = currentSeriesNum + "%" + currentEpisodeNam + "%" + secondsIntoProgramme;
@@ -962,7 +975,13 @@
 
             // display an "OK" message in activitypanel
 
-            var message = "<p style='margin-top:3vh; text-align: center; color: blue'><span>Note removed</span></p>";
+            if (noteType === "note") {
+                var noteDisplayType = "Note";
+            } else {
+                var noteDisplayType = "Query";
+            }
+
+            var message = "<p style='margin-top:3vh; text-align: center; color: blue'><span>" + noteDisplayType + " removed</span></p>";
             setActivityPanelToString(message);
         }
 
@@ -971,7 +990,7 @@
 
             // display the text for textSource, first retrieving this, if necessary, from the BBC page
             // for the text-type. Where the display request has come from the search panel, highlight
-            // the searchWord occurrentces in the text
+            // the searchWord occurrences in the text
 
             // textKey is constructed from the following four components: 
             // **  seriesNum, episodeNam, textType, textTitle separated by % symbols **
@@ -991,7 +1010,7 @@
 
             const db = await idb.openDB('BaB', 1);
 
-            // Try to retrieve the text for the given key
+            // try to retrieve the text for the given key
             {
 
                 transcriptSource = await db.get('texts', textKey);
@@ -1015,9 +1034,8 @@
                             alert(response);
                         } else {
 
-                            // extracting the text with javascript is surprisingly quick - php
-                            // turned it to be effectively slowere because it didn't benefit from
-                            // local caching of the bbc web-page
+                            // extracting the text with javascript turned out to be no slower than using php
+                            // and generally faster - hard to see why
 
                             transcriptSource = autoEditText(response);
                             hideWaitIcon();
@@ -1141,11 +1159,6 @@
         function displayAFBSearchResults(searchWord) {
 
             if (searchWord) {
-
-                // this seemed originally to be set to target the mobile(?) version of afb - note have changed to https now from very first version of this code
-                // In March 2019 started to get "asynchronous op denied" error msg. Found that could fall back to the main version.
-                // var DictionaryWindow = window.open("https://www.faclair.com/mm/index.aspx?txtSearch=" + searchWord, "AFB", "width=500, height=600, resizable=1, menubar=no, scrollbars=1, status=1, titlebar=1, toolbar=no, location=no, personalbar=1");
-
                 if (currentDictionaryPref === "AFB") {
                     var DictionaryWindow = window.open("https://www.faclair.com/index.aspx?txtSearch=" + searchWord, "AFB", "width=500, height=600, resizable=1, menubar=no, scrollbars=1, status=1, titlebar=1, toolbar=no, location=no, personalbar=1");
                 } else {
@@ -1450,13 +1463,17 @@
         }
 
         async function backupDataStores() {
-            // build a "fileString" consisting of jotter + "%%%$$$" + notesJson, pass this to php
-            // so that this can save it in a uniquely-named) file on the server and return the name
-            // so that we can use this to call download_babbackup.php to download this to the user's
-            // download folder (in a standard babbackup,txt file). This complicated to and fro is
-            // due to the fact that the Content-Disposition: attachment header doesn't work when
-            // it's called from javascript via an xmhttp request - you just get the file content
-            // in your response variable! - see https://medium.com/@drevets/you-cant-prompt-a-file-download-with-the-content-disposition-header-using-axios-xhr-sorry-56577aa706d6
+
+            // build a "fileString" consisting of jotter + "%%%$$$" + notesJson, pass this to the php
+            // backup_date_stores module in player_helpers.php so that this can save it in a uniquely-named
+            // file on the server and return its name. We then use this to call download_babbackup.php to 
+            // download the to the user's download folder (in a standard babbackup,txt file) by putting the
+            // filenme into the href of an <a> element and dynamically clicking this. 
+            
+            // This complicated to and fro is due to the fact that the Content-Disposition: attachment header
+            // doesn't work when it's called from javascript via an xmlhttp request - you just get the file 
+            // content in your response variable! -
+            // - see https://medium.com/@drevets/you-cant-prompt-a-file-download-with-the-content-disposition-header-using-axios-xhr-sorry-56577aa706d6
 
             const db = await idb.openDB('BaB', 1);
 
@@ -1529,12 +1546,23 @@
         var restoreId;
         function uploadBackupFile() {
 
-            // it's not possible to collect a filename from a local execution and expect it to
-            // be available in $_FILES when a server-based PHP program goes looking for it - we
-            // have to do this from web-sourced page. We launch this into a popup - but first
-            // of all, the transation is going to need some sort of unique identifier, so
-            // get this from the database and add it as a 'get' parameter so it's available to 
-            // the popup
+            // The user's jotter and note data sources are held in a local file. But we can't
+            // read this - all a browser can do with a local file is upload it to the server.
+            // If we do this and store the file on the server we can then use an XMLHTTP request
+            // to read the file and "echo" the content back to the browser. But there are two 
+            // snags. The first of these is easy to fix - because there's the lossibility that 
+            // several users might be trying to do this at the same time, we have to give each
+            // one a unique filename. So, before we upload the file we use the server to get
+            // a unique number for the restore and return it to use before we start. So far
+            // so good. The second problem is a bit more tricky. it's not possible to collect 
+            // a filename from a /local/ execution like babindex.html and expect it to
+            // be available in $_FILES when a /server-based/ PHP program goes looking for it - we
+            // have to do this from a web-sourced page. We get round this by launch the file-upload
+            // from a web-sourced popup that we start from babindex.html. To complete the circle
+            // we give the unique file-number into the popup as a GET parameter when we lauch itt. 
+            // Thus, the complete sequence is as follows:
+
+            // first of all get the unique number
 
             var form = document.forms.namedItem("dummyform");
             var oData = new FormData(form);
@@ -1551,17 +1579,27 @@
 
                     var transitFilename = "babbackup" + response + ".txt";
 
+                    // Now launch the popup with the unique filenumber as a GET parameter to the server-based
+                    // upload_babbackup.html file. This will invite the user to select their backup filename
+
                     restoreInProgress = true;
                     restoreId = response;
                     displayPopupWindow("https://ngatesystems.com/beagairbheag/upload_babbackup.html?transitfilename=" + transitFilename);
 
-                    // the popup will create a function that auto-closes when the uses clicks outside.
-                    // this will fire restoreDataStores if it sees that restoreInProgress is true
+                    // When the user clicks the restore button on upload_babbackup.html having first selected
+                    // their backup file, upload_babbackup.html will call the upload_backup_file module in player_helpers
+                    // to upload the file to the server and save it in the unique location on the server. All that;s
+                    // needed now is to fire an XMLHTTP request to read the file and echo its content to babindex.html
+                    // so that we can extract the jsons and rebuild the datastore. this is accomplished by inviting the
+                    // user to "click outside this popup to finalize the restore" - this message is displyed when they
+                    // click the restore button. Finally, clicking outside the popup fires a function that was created
+                    // by babindex.html when the popup was opened. This calls restoreDataStores function in babindex.html
+                    // to complete the process
+
                 }
             };
             oReq.send(oData);
         }
-
 
         async function restoreDataStores() {
 
@@ -1613,8 +1651,7 @@
 
                     // notes are a bit more tricky - need to delete all the existing notes
                     // with a "clear" and then insert the replacements from the recovered
-                    // notes json. Should really do all of this in a txn but not sure how
-                    // just now
+                    // notes json. 
 
                     const tx = db.transaction('notes', 'readwrite');
                     notesArray = JSON.parse(notesJson);
@@ -1659,7 +1696,7 @@
 
         function displayPopupWindow(url) {
 
-            // popup is displayed as a centered panel of .75 display width and display height
+            // popup is displayed as a centered panel of .75 display width/height
 
             var popupWidth = 0.75 * (window.innerWidth);
             var popupHeight = 0.75 * (window.innerHeight);
@@ -1715,7 +1752,6 @@
         }
 
         function hideWaitIcon() {
-            // according to w3c spec this suspends operation of the animation as well as hiding it
             waiticon.style.display = "none";
         }
 

@@ -21,20 +21,10 @@ require('../includes/beagairbheag_functions.php');
 // 'build_programme_picklists'          -   return code to display the series and epsiode picklists
 //                                          and initialise these with given series_num and episode_nam
 //
-// 'build_noteline'                     -   return code to display the note icons on the noteline for
-//                                          given series_num, episode_nam and user_id
-//
 // 'build_textline'                     -   return code to display the text bars on the textline for
 //                                          given series_num and episode_nam
 //
 // 'get_transcript_source'              -   return the source code for given web-page
-//
-// 'build_insert_note_panel'            -   return code to display an insert_note_panel. There are no input parameters
-//                                          and php is used here soley to provide consistency with the
-//                                          build_edit_note_panel below
-//
-// 'build_edit_note_panel'              -   return code to display an edit_noet_panel for given note_id for
-//                                          given series_num, episode_nam and user_id
 //
 // 'get_programme_data'                 -   return the filename for given series_num and episode_na
 //
@@ -56,7 +46,6 @@ $page_title = 'player_helpers';
 date_default_timezone_set('Europe/London');
 
 $helper_type = $_POST['helper_type'];
-
 
 // connect to the beagairbheag database
 
@@ -132,46 +121,6 @@ if ($helper_type == "build_programme_picklists") {
     echo "<returns>$return</returns>";
 }
 
-//////////////////////////////////////////  build_noteline ////////////////////////////////////////
-
-if ($helper_type == "build_noteline") {
-    $series_num = $_POST['series_num'];
-    $episode_nam = $_POST['episode_nam'];
-    $user_id = $_POST['user_id'];
-    $scale_factor = $_POST['scale_factor'];
-    $scale_correction_for_note = $_POST['scale_correction_for_note'];
-
-    $sql = "SELECT * FROM programme_notes
-            WHERE 
-                series_num = '$series_num' AND
-                episode_nam = '$episode_nam' AND
-                note_user_id = '$user_id'
-            ORDER BY seconds_into_programme ASC";
-
-
-    $result = sql_result_for_location($sql, 3);
-
-    $return = '';
-
-    while ($row = mysqli_fetch_array($result)) {
-        $seconds_into_programme = $row['seconds_into_programme'];
-        $note_text = $row['note_text'];
-        $note_type = $row['note_type'];
-
-        $margin_left = ($seconds_into_programme * $scale_factor) + $scale_correction_for_note;
-        $note_text_stub = substr($note_text, 0, 15) . ' ...';
-
-        $return .= "<a id='n$seconds_into_programme'" .
-                            "style='position:absolute; margin-left: $margin_left" . "px;'" .
-                            "title='$note_text_stub'" .
-                            "onclick = 'displayEditNotePanel(\"n$seconds_into_programme\");'>" .
-                        "<img class='notemark' src='img/notemarkblack.png'>" .
-                    "</a>";
-    }
-
-    echo $return;
-}
-
 //////////////////////////////////////////  build_textline ////////////////////////////////////////
 
 if ($helper_type == "build_textline") {
@@ -240,156 +189,10 @@ if ($helper_type == "build_textline") {
 if ($helper_type == "get_transcript_source") {
     $url = $_POST['url'];
 
-    $raw_contents = file_get_contents($url); // needed to set allow_url_fopen in php.ini (see options in choose PHP version)
- 
+    $raw_contents = file_get_contents($url); 
+    
     echo $raw_contents;
 
-    /* left extraction to javascript code for the present - at least this benefits from local caching
-    $extracted_contents = '';
-    $out_of_paras = false;
-
-    while (!$out_of_paras) {
-        $raw_contents_length = strlen($raw_contents);
-        // get position of first <p>
-        $para_start = strpos($raw_contents, "<p>");
-
-        if ($para_start === false) {
-            $out_of_paras = true;
-        } else {
-
-        // ignore text before this point
-            $raw_contents = substr($raw_contents, $para_start, $raw_contents_length);
-            $raw_contents_length = strlen($raw_contents);
-            // get position of companion  </p>
-            $para_end = strpos($raw_contents, "</p>");
-            // tuck away everything up to this point
-            $extracted_contents = $extracted_contents . substr($raw_contents, 0, $para_end + 4);
-            // ignore text before this point
-            $raw_contents = substr($raw_contents, $para_end + 4, $raw_contents_length);
-        }
-
-    // change any ʼ characters to ' - they cause 503 errors on the POST!
-    // $output = str_replace('/ʼ/g', "'", $output);
-    // $output = str_replace('/‘/g', "'", $output);
-
-    }
-
-    echo $extracted_contents;
-
-    */
-}
-
-//////////////////////////////////////////  build_insert_note_panel ////////////////////////////////////////
-
-if ($helper_type === "build_insert_note_panel") {
-    echo '
-        <div style="
-                display: flex;
-                width: 60%;
-                margin: 20px auto;
-                border-style: solid;
-                border-width: thin;
-                padding: 5px;
-                justify-content: space-around;">
-            <div><button id="lBiteButton" title="Start the sound-bite one second ealier" onclick="playBiteNudgedLeft();"
-                    type="button">Nudge L</button>
-            </div>
-            <div><button id="pBiteButton" title="Play a four-second sound-bite centred on the current time"
-                    onclick="postTime=music.currentTime; playBite();" type="button">Play</button>
-            </div>
-            <div><button id="rBiteButton" title="Start the sound-bite one second later" onclick="playBiteNudgedRight();"
-                    type="button">Nudge R</button>
-            </div>
-        </div>
-
-        <p style="text-align: center">Note/Query text</p>
-        <textarea id="cnotetext" rows="4" cols="50" style="margin: 5px auto; display: block;" name="cnotetext"
-            title="Notes on sound - eg \'jay hoorshht e\' = dè thuirt e : what did he say?"></textarea>
-
-        <div style="
-                        display: flex;
-                        width: 60%;
-                        margin: 20px auto;
-                        border-style: solid;
-                        border-width: thin;
-                        padding: 5px;
-                        justify-content: space-around;">
-            <div><button onclick="insertNote(\'note\')" type="button">Save as Note</button></div>
-            <div><button onclick="insertNote(\'query\')" type="button">Save as Query</button>
-            </div>
-            <div><button onclick="activitypanel.innerHTML = \'\';" type="button">Cancel</button></div>
-        </div><br>
-    </div>';
-}
-
-//////////////////////////////////////////  build_edit_note_panel ////////////////////////////////////////
-
-if ($helper_type === "build_edit_note_panel") {
-    $series_num = $_POST['series_num'];
-    $episode_nam = $_POST['episode_nam'];
-    $note_user_id = $_POST['note_user_id'];
-    $seconds_into_programme = $_POST['seconds_into_programme'];
-
-    $note_id = "n" . floor($seconds_into_programme);
-
-    $sql = "SELECT * FROM programme_notes
-            WHERE 
-                series_num = '$series_num' AND
-                episode_nam = '$episode_nam' AND
-                note_user_id = '$note_user_id'AND
-                seconds_into_programme = '$seconds_into_programme'";
-
-    $result = sql_result_for_location($sql, 6);
-
-    $row = mysqli_fetch_assoc($result);
-
-    $note_text = $row['note_text'];
-    $note_type = $row['note_type'];
-    
-    $return = "
-        <div style='margin: 20px auto; text-align: center;'>
-            <button id='enBiteButton' type='button'>Play Again</button>
-        </div>        
-        <textarea id='enotetext' rows='4' cols='50' name='ecnotetext' 
-            style='margin: 5px auto; display: block;'>$note_text
-        </textarea>
-        <div style='
-                display: flex;
-                border-style: solid;
-                border-width: thin;
-                margin:  20px auto;
-                width: 15%;
-                padding: 5px;
-                justify-content: center;'>                       
-            <button title='Save edited Note' type='button'
-                onclick = 'editNote(\"$note_id\", \"$note_type\");'>Save</button>
-        </div>
-        <div style='
-                display: flex;
-                width: 60%;
-                margin: 20px auto;
-                border-style: solid;
-                border-width: thin;
-                padding: 5px;
-                justify-content: space-around;'>";
-                    
-    if ($note_type === "note") {
-        $return .= "<button title='Change note type to \"Query\"' type='button'
-            onclick = 'editNote(\"$note_id\", \"query\");'>Re-save as Query</button>";
-    } else {
-        $return .= "<button title='Change note type to \"Note\"' type='button'
-            onclick = 'editNote(\"$note_id\", \"note\");'>Re-save as Note</button>";
-    }
-
-    $return .=" <button title='Delete Note' type='button'
-                    onclick = 'deleteNote(\"$note_id\");'>Delete</button>
-                <button  type='button'
-                    onclick='activitypanel.innerHTML = \"\"";
-    ">Cancel</button>
-            </div>";
-
-
-    echo $return;
 }
 
 //////////////////////////////////////////  get_programme_data ////////////////////////////////////////
