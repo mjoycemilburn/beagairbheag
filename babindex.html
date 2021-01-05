@@ -654,16 +654,16 @@
             // Also use the sample note mark to get the scaled width of the notemark image - 
             // this is used to position the centre of the mark precisely
 
-            playWidth = document.getElementById('playline').offsetWidth;
-            headWidth = document.getElementById('playhead').offsetWidth;
-            noteWidth = document.getElementById('nsample').offsetWidth;
+            playWidth = document.getElementById('playline').getBoundingClientRect().width; // floating point number
+            headWidth = document.getElementById('playhead').getBoundingClientRect().width;
+            noteWidth = document.getElementById('nsample').getBoundingClientRect().width;
 
             // We calculate the left margin of a note img at time t seconds as :
             // (0.5 * headWidth) + (t * (playWidth- headWidth) / duration) - (0.5* noteWidth)
             // or t*scaleFactor + scaleCorrectionForNote
 
             var scaleFactor = (playWidth - headWidth) / duration;
-            var scaleCorrectionForNote = (0.5 * headWidth) - (0.5 * noteWidth);
+            var scaleCorrectionForNote = (0.5 * headWidth) - (0.5 * noteWidth); // note this is a floating point number
 
             buildNoteline(currentSeriesNum, currentEpisodeNam, scaleFactor, scaleCorrectionForNote);
 
@@ -716,6 +716,7 @@
             localStorage.setItem('lastDictionaryPref', currentDictionaryPref);
         }
 
+        var noteLeftMargins = [];
         async function buildNoteline(seriesNum, episodeNam, scaleFactor, scaleCorrectionForNote) {
 
             // clear away any existing NoteLine content
@@ -742,13 +743,13 @@
                     var noteText = noteObjects[i].notetext;
                     var noteType = noteObjects[i].notetype;
 
-                    var marginLeft = (secondsIntoProgramme * scaleFactor) + scaleCorrectionForNote;
+                    var marginLeft = Math.round((secondsIntoProgramme * scaleFactor) + scaleCorrectionForNote);
                     var noteTextStub = noteText;
                     if (noteText.length > 15) noteTextStub = noteText.substring(0, 15) + ' ...';
 
                     noteLine += "\
                     <a id='n" + secondsIntoProgramme + "'\
-                        style='position:absolute; margin-left: " + marginLeft + "px; cursor: pointer;' \
+                        style='position:absolute; margin-left: " + marginLeft + "px; cursor: pointer; width: 5px; text-align: center;' \
                         title='" + noteTextStub + "'\
                         onclick = 'displayEditNotePanel(\"n" + secondsIntoProgramme + "\");'>";
 
@@ -758,8 +759,14 @@
                         noteLine += "<img class='notemark' src='https://ngatesystems.com/beagairbheag/img/notemarkred.svg'></a>";
                     }
 
+                    // create an entry in the noteLeftMargins array - we use this later to prevent the user from
+                    // creating notes that are so close together they obscure each other
+
+                    noteLeftMargins.push(marginLeft);
+
                 }
                 document.getElementById('notes').innerHTML = noteLine;
+                noteLeftMargins.sort(function (a, b) { return a - b }); // sort the left margins in ascending numerial order
             }
         }
 
@@ -792,11 +799,12 @@
 
             // insert a note of the given type for the current series and episode into the notes datastore
 
-            var postTimeAsInteger = Math.floor(postTime);
+            var postTimeAsInteger = Math.round(postTime);
             var newnote = document.getElementById("n" + postTimeAsInteger);
+            var marginLeft = (0.5 * headWidth) + (postTimeAsInteger * (playWidth - headWidth) / duration) - (0.5 * noteWidth);
 
-            if (newnote != null) {
-                alert('Oops - there is already a note at this location!');
+            if (newNoteTooCloseToExisting(marginLeft)) {
+                alert('Oops - this note will be too close to an existing note');
                 return;
             }
 
@@ -842,7 +850,6 @@
             newNote.setAttribute("id", "n" + postTimeAsInteger);
             newNote.setAttribute("title", noteText.substring(0, 15));
 
-            var marginLeft = (0.5 * headWidth) + (postTimeAsInteger * (playWidth - headWidth) / duration) - (0.5 * noteWidth);
             newNote.setAttribute("style", "position: absolute; margin-left: " + marginLeft + "px");
 
             var onclickLink = "displayEditNotePanel('n" + postTimeAsInteger + "')";
@@ -862,6 +869,35 @@
 
             var message = "<p style='margin-top:3vh; text-align: center; color: blue'><span>" + noteDisplayType + " saved</span></p>";
             setActivityPanelToString(message);
+
+            // add the new note to the noteLeftMargins array and re-sort it
+
+            noteLeftMargins.push(marginLeft);
+            noteLeftMargins.sort(function (a, b) { return a - b });
+
+        }
+
+        function newNoteTooCloseToExisting(leftMargin) {
+            // checks that a propsed neew note will not be so close to an existing note that
+            // their notemarks will obscure one another - they need to be at least 1.25* noteWidth apart
+
+            var lastLeftMarginBefore = -1;
+            var firstLeftMarginAfter = -1;
+
+            for (var i = 0; i < noteLeftMargins.length; i++) {
+                var j = noteLeftMargins.length - i;
+
+                if (noteLeftMargins[i] < leftMargin) lastLeftMarginBefore = noteLeftMargins[i];
+                if (noteLeftMargins[j] > leftMargin) firstLeftMarginAfter = noteLeftMargins[j];
+
+            }
+
+            if (lastLeftMarginBefore == -1 && firstLeftMarginAfter == -1) return false;
+            if (lastLeftMarginBefore == -1 && (firstLeftMarginAfter - leftMargin) > .5 * noteWidth) return false;
+            if (firstLeftMarginAfter == -1 && (leftMargin - lastLeftMarginBefore) > .5 *noteWidth) return false;
+            if (((firstLeftMarginAfter - leftMargin) > 1.25) && ((leftMargin - lastLeftMarginBefore) > .5 *noteWidth)) return false;
+
+            return true;
 
         }
 
@@ -970,8 +1006,19 @@
                 }
             }
 
-            var noteelement = document.getElementById("n" + secondsIntoProgramme);
-            noteelement.remove();
+            var noteElement = document.getElementById("n" + secondsIntoProgramme);
+            noteElement.remove();
+
+            // remove it from the noteLeftMargins array too
+
+            var noteLeftMargin = noteElement.style.marginLeft;
+            for (var i = 0; i < noteLeftMargins.length; i++) {
+
+                if (noteLeftMargins[i] + "px" === noteLeftMargin) {
+                    noteLeftMargins.splice(i, 1);
+                    i--;
+                }
+            }
 
             // display an "OK" message in activitypanel
 
@@ -983,6 +1030,7 @@
 
             var message = "<p style='margin-top:3vh; text-align: center; color: blue'><span>" + noteDisplayType + " removed</span></p>";
             setActivityPanelToString(message);
+
         }
 
         var transcriptSource;
@@ -1469,7 +1517,7 @@
             // file on the server and return its name. We then use this to call download_babbackup.php to 
             // download the to the user's download folder (in a standard babbackup,txt file) by putting the
             // filenme into the href of an <a> element and dynamically clicking this. 
-            
+
             // This complicated to and fro is due to the fact that the Content-Disposition: attachment header
             // doesn't work when it's called from javascript via an xmlhttp request - you just get the file 
             // content in your response variable! -
@@ -1891,7 +1939,7 @@
 
         function wheelOnPlayline(event) {
             // This function advances or rewinds the playhead by 2 sec in reponse to movements of the mouse wheel
-            console.log("inwheel");
+            //("inwheel");
             // timeUpdate will move the playhead 
             //Math.sign doesn't work in IE so use straight code
             if (event.deltaY > 0) {
@@ -1907,7 +1955,7 @@
 
         // mouseDown EventListener
         function mouseDownOnPlayhead() {
-            console.log("in mousedownonplayhead");
+            //console.log("in mousedownonplayhead");
             clickOnPlayhead = true;
             // We use two techniques to move the playhead. Generally, the playhead is moved by the timeUpdate
             // function which moves the playhead by tracking music.currentTime. But during "dragging" of the
@@ -1938,7 +1986,7 @@
                 clickOnPlayhead = false;
 
                 music.currentTime = duration * clickPercent(event);
-                console.log("in mouseuponplayhead1 " + duration + " " + clickPercent(event));
+                //console.log("in mouseuponplayhead1 " + duration + " " + clickPercent(event));
 
                 // restart music if it was playing before we moved the playhead - but in the new position. The
                 // playhead position will be updated by timeUpdate
@@ -1953,16 +2001,24 @@
 
             // move playhead using "Eventx" approach
             var newMargLeft = event.clientX - getPosition(playline) - 0.5 * playhead.offsetWidth;
-            console.log("In movePlayhead newMargLeft duration click%" + newMargLeft + " " + duration + " " + clickPercent(event));
+            //console.log("In movePlayhead newMargLeft duration click%" + newMargLeft + " " + duration + " " + clickPercent(event));
 
             if (newMargLeft >= 0 && newMargLeft <= playWidth) {
                 playhead.style.marginLeft = newMargLeft + "px";
             }
             if (newMargLeft < 0) {
                 playhead.style.marginLeft = "0px";
+                // regard the Playhead move as terminated if we go off the ends, otherwise we end up
+                // find ourselves 'mouse-upping' off the playhead and so don't catch the event
+                playline.removeEventListener('pointermove', movePlayhead);
+                music.addEventListener("timeupdate", timeUpdate);
+                music.currentTime = 0;
             }
-            if (newMargLeft > playWidth) {
-                playhead.style.marginLeft = playWidth + "px";
+            if (newMargLeft > (playWidth - headWidth)) {
+                playhead.style.marginLeft = (playWidth - headWidth) + "px";
+                playline.removeEventListener('pointermove', movePlayhead);
+                music.addEventListener("timeupdate", timeUpdate);
+                music.currentTime = duration;
             }
 
             document.getElementById("currtime").innerHTML = formatTime(Math.round(duration * clickPercent(event)));
