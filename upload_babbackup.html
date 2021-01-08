@@ -11,13 +11,13 @@
         <p> <label>Backup filename:</label>
             <input type='file' id='backupfilenameid' name='backupfilename' maxlength="32" size="12">
             <button id="uploadbutton" type="button"
-                onclick="document.getElementById('finalize').style.display = 'block'; uploadBackupFile();">Restore
+                onclick="uploadBackupFile();">Restore
             </button>
         </p>
     </form>
 
     <div id="finalize" style="display: none; margin-top: 3vh; color: red; text-align: center;">
-        <span>OK - all good. Now click outside this popup to finalize the restore</span>
+        <span>OK - all good. Now click outside this popup to finalize the restore.</span>
     </div>
 
     <!-- the "Restore" button above will fire up player_helpers to upload the supplied backup file above
@@ -30,6 +30,8 @@
     <script>
 
         function uploadBackupFile() {
+
+            if (document.getElementById('backupfilenameid').value == '') return;
 
             // retrieve the in-coming transitFilename
 
@@ -47,6 +49,7 @@
                     if (response.indexOf("%failed%") != -1) {
                         alert(response);
                     }
+                    document.getElementById('finalize').style.display = 'block'; 
                 }
             }
             oReq.send(oData);

@@ -368,7 +368,7 @@
 
     <script>
 
-        var currentSystemVersionNumber = "1.10";
+        var currentSystemVersionNumber = "1.00";
         var latestSystemVersionNumber;
         var cryptography; // text for cryptography, about and hints will be served from central sources
         var about;
@@ -441,12 +441,77 @@
 
         var activitypanel = document.getElementById("activitypanel");
 
-        window.onload = async function () {
+        window.onload = function () {
 
-            // launch a few low-priority asynch operation in parallel
+            // get latest system version number - low priority asynch operation 
 
-            getLatestSystemVersionNumber(); // won't need this until user clicks 'about'
-            initialiseTextTypeData(); // won't need this until we display the texts line
+            var form1 = document.forms.namedItem("dummyform");
+            var oData1 = new FormData(form1);
+            oData1.append("helper_type", "get_system_data");
+            var oReq1 = new XMLHttpRequest();
+            oReq1.open("POST", "https://ngatesystems.com/beagairbheag/php/player_helpers_v1.00.php", true);
+            oReq1.onload = function (oEvent) {
+                if (oReq1.status == 200) {
+
+                    var response = oReq1.responseText;
+                    if (response.indexOf("%failed%") != -1) {
+                        alert(response);
+                    } else {
+
+                        var xmlDoc = oReq1.responseXML;
+                        var JSONString = xmlDoc.getElementsByTagName("returns")[0].childNodes[0].nodeValue;
+                        var JSONObject = JSON.parse(JSONString);
+
+                        latestSystemVersionNumber = JSONObject.versionnumber;
+                        cryptography = JSONObject.cryptography;
+                        about = JSONObject.about;
+                        hints = JSONObject.hints;
+
+
+                        var aboutHeader = "<p style = 'text-align: center; color:blue;''>\
+                        You are currently using version v" + currentSystemVersionNumber + " of the Companion.";
+
+                        if (latestSystemVersionNumber > currentSystemVersionNumber) {
+                            var dateObject = new Date();
+                            var currentTime = dateObject.getTime();
+                            aboutHeader += "The latest version is v" + latestSystemVersionNumber + ". Click \
+                            <a href = 'https://ngatesystems.com/beagairbheag/index.html?ver=" + currentTime + "' >here</a> if you would like to upgrade";
+                        } else {
+                            aboutHeader += "This is the latest version of the Companion.";
+                        }
+
+                        about = aboutHeader + "</p>" + about;
+
+                    }
+                }
+            };
+
+            oReq1.send(oData1);
+
+            // launch initialisation of textTypesData (header info) - another pow priority asynch operation
+
+            var form2 = document.forms.namedItem("dummyform");
+            var oData2 = new FormData(form2);
+            oData2.append("helper_type", "get_text_types_data");
+            var oReq2 = new XMLHttpRequest();
+            oReq2.open("POST", "https://ngatesystems.com/beagairbheag/php/player_helpers_v1.00.php", true);
+            oReq2.onload = function (oEvent) {
+                if (oReq2.status == 200) {
+
+                    var response = oReq2.responseText;
+                    if (response.indexOf("%failed%") != -1) {
+                        alert(response);
+                    } else {
+
+                        var xmlDoc = oReq2.responseXML;
+                        var JSONString = xmlDoc.getElementsByTagName("returns")[0].childNodes[0].nodeValue;
+                        textTypesData = JSON.parse(JSONString);
+
+                    }
+                }
+            };
+
+            oReq2.send(oData2);
 
             // make sure we've got an indexedDB database with all the necessary datastores
 
@@ -460,70 +525,6 @@
 
             buildProgrammePicklists(currentSeriesNum, currentEpisodeNam);
 
-        }
-
-        async function getLatestSystemVersionNumber() {
-
-            // get latest system version number - low priority asynch operation 
-
-            var fData = new FormData(document.getElementById("dummyform"));
-            fData.append("helper_type", "get_system_data");
-
-            try {
-                const response = await get("https://ngatesystems.com/beagairbheag/php/player_helpers_v1.10.php", fData)
-
-                if (response.indexOf("%failed%") != -1) {
-                    alert(response);
-                } else {
-
-                    const JSONObject = JSON.parse(response);
-
-                    latestSystemVersionNumber = JSONObject.versionnumber;
-                    cryptography = JSONObject.cryptography;
-                    about = JSONObject.about;
-                    hints = JSONObject.hints;
-
-                    var aboutHeader = "<p style = 'text-align: center; color:blue;''>\
-                        You are currently using version v" + currentSystemVersionNumber + " of the Companion.";
-
-                    if (latestSystemVersionNumber > currentSystemVersionNumber) {
-                        var dateObject = new Date();
-                        var currentTime = dateObject.getTime();
-                        aboutHeader += "The latest version is v" + latestSystemVersionNumber + ". Click \
-                            <a href = 'https://ngatesystems.com/beagairbheag/index.html?ver=" + currentTime + "' >here</a> if you would like to upgrade";
-                    } else {
-                        aboutHeader += "This is the latest version of the Companion.";
-                    }
-
-                    about = aboutHeader + "</p>" + about;
-                }
-            }
-            catch (err) {
-                alert("Failed! " + err);
-                return;
-            }
-        }
-
-        async function initialiseTextTypeData() {
-            // launch initialisation of textTypesData (header info) - another low priority asynch operation
-
-            var fData = new FormData(document.getElementById("dummyform"));
-            fData.append("helper_type", "get_text_types_data");
-
-            try {
-                const response = await get("https://ngatesystems.com/beagairbheag/php/player_helpers_v1.10.php", fData)
-
-                if (response.indexOf("%failed%") != -1) {
-                    alert(response);
-                } else {
-
-                    textTypesData = JSON.parse(response);
-                }
-            }
-            catch (err) {
-                alert("Failed! " + err);
-                return;
-            }
         }
 
         async function initialiseIndexedDBStores() {
@@ -577,48 +578,49 @@
                     if (e.toString().indexOf(recordAlreadyExists) != -1) {
                         return;
                     } else {
-                        alert("Failed! " + e);
-                        return;
+                        console.error(e);
                     }
                 }
             }
         }
 
-        async function buildProgrammePicklists(seriesNum, episodeNam) {
+        function buildProgrammePicklists(seriesNum, episodeNam) {
 
-            var fData = new FormData(document.getElementById("dummyform"));
-            fData.append("helper_type", "build_programme_picklists");
-            fData.append("series_num", seriesNum);
-            fData.append("episode_nam", episodeNam);
+            var form = document.forms.namedItem("dummyform");
+            var oData = new FormData(form);
+            oData.append("helper_type", "build_programme_picklists");
+            oData.append("series_num", seriesNum);
+            oData.append("episode_nam", episodeNam);
+            var oReq = new XMLHttpRequest();
+            oReq.open("POST", "https://ngatesystems.com/beagairbheag/php/player_helpers_v1.00.php", true);
+            oReq.onload = function (oEvent) {
+                if (oReq.status == 200) {
 
-            try {
-                const response = await get("https://ngatesystems.com/beagairbheag/php/player_helpers_v1.10.php", fData)
+                    var response = oReq.responseText;
+                    if (response.indexOf("%failed%") != -1) {
+                        alert(response);
+                    } else {
+                        var xmlDoc = oReq.responseXML;
+                        var JSONString = xmlDoc.getElementsByTagName("returns")[0].childNodes[0].nodeValue;
+                        var JSONObject = JSON.parse(JSONString);
 
-                if (response.indexOf("%failed%") != -1) {
-                    alert(response);
-                } else {
+                        seriesPicklist = JSONObject.seriespicklist;
+                        episodePicklist = JSONObject.episodepicklist;
 
-                    const JSONObject = JSON.parse(response);
-                    seriesPicklist = JSONObject.seriespicklist;
-                    episodePicklist = JSONObject.episodepicklist;
+                        document.getElementById('seriespicklistcontainer').innerHTML = seriesPicklist;
+                        document.getElementById('episodepicklistcontainer').innerHTML = episodePicklist;
 
-                    document.getElementById('seriespicklistcontainer').innerHTML = seriesPicklist;
-                    document.getElementById('episodepicklistcontainer').innerHTML = episodePicklist;
+                        buildScreenForCurrentEpisode();
 
-                    buildScreenForCurrentEpisode();
-
-                    if (currentSeriesNum != '') music.src = currentBBCDownloadFilename + ".mp3";
-                    music.currentTime = 0;
+                        if (currentSeriesNum != '') music.src = currentBBCDownloadFilename + ".mp3";
+                        music.currentTime = 0;
+                    }
                 }
-            }
-            catch (err) {
-                alert("Failed! " + err);
-            }
+            };
+            oReq.send(oData);
         }
 
         var audioExceptionMessageJustDisplayed = false;
-        var scaleFactor;
-        var scaleCorrectionForNote;
 
         function buildScreenForCurrentEpisode() {
 
@@ -660,8 +662,8 @@
             // (0.5 * headWidth) + (t * (playWidth- headWidth) / duration) - (0.5* noteWidth)
             // or t*scaleFactor + scaleCorrectionForNote
 
-            scaleFactor = (playWidth - headWidth) / duration;
-            scaleCorrectionForNote = (0.5 * headWidth) - (0.5 * noteWidth); // note this is a floating point number
+            var scaleFactor = (playWidth - headWidth) / duration;
+            var scaleCorrectionForNote = (0.5 * headWidth) - (0.5 * noteWidth); // note this is a floating point number
 
             buildNoteline(currentSeriesNum, currentEpisodeNam, scaleFactor, scaleCorrectionForNote);
 
@@ -768,28 +770,29 @@
             }
         }
 
-        async function buildTextsline(seriesNum, episodeNam, scaleFactor, scaleCorrectionForText) {
+        function buildTextsline(seriesNum, episodeNam, scaleFactor, scaleCorrectionForText) {
 
-            var fData = new FormData(document.getElementById("dummyform"));
-            fData.append("helper_type", "build_textline");
-            fData.append("series_num", seriesNum);
-            fData.append("episode_nam", episodeNam);
-            fData.append("scale_factor", scaleFactor);
-            fData.append("scale_correction_for_text", scaleCorrectionForText);
+            var form = document.forms.namedItem("dummyform");
+            var oData = new FormData(form);
+            oData.append("helper_type", "build_textline");
+            oData.append("series_num", seriesNum);
+            oData.append("episode_nam", episodeNam);
+            oData.append("scale_factor", scaleFactor);
+            oData.append("scale_correction_for_text", scaleCorrectionForText);
+            var oReq = new XMLHttpRequest();
+            oReq.open("POST", "https://ngatesystems.com/beagairbheag/php/player_helpers_v1.00.php", true);
+            oReq.onload = function (oEvent) {
+                if (oReq.status == 200) {
 
-            try {
-                const response = await get("https://ngatesystems.com/beagairbheag/php/player_helpers_v1.10.php", fData)
-
-                if (response.indexOf("%failed%") != -1) {
-                    alert(response);
-                } else {
-                    document.getElementById('textline').innerHTML = response;
+                    var response = oReq.responseText;
+                    if (response.indexOf("%failed%") != -1) {
+                        alert(response);
+                    } else {
+                        document.getElementById('textline').innerHTML = response;
+                    }
                 }
-            }
-            catch (err) {
-                alert("Failed! " + err);
-            }
-
+            };
+            oReq.send(oData);
         }
 
         async function insertNote(noteType) {
@@ -827,7 +830,6 @@
                     ]);
                 } catch (e) {
                     alert(e);
-                    return;
                 }
             }
 
@@ -956,7 +958,6 @@
                     ]);
                 } catch (e) {
                     alert(e);
-                    return;
                 }
             }
 
@@ -1002,7 +1003,6 @@
                     ]);
                 } catch (e) {
                     alert(e);
-                    return;
                 }
             }
 
@@ -1068,37 +1068,37 @@
 
                 showWaitIcon();
 
-                var fData = new FormData(document.getElementById("dummyform"));
-                fData.append("helper_type", "get_transcript_source");
-                fData.append("url", textUrl);
+                var form = document.forms.namedItem("dummyform");
+                var oData = new FormData(form);
+                oData.append("helper_type", "get_transcript_source");
+                oData.append("url", textUrl);
+                var oReq = new XMLHttpRequest();
+                oReq.open("POST", "https://ngatesystems.com/beagairbheag/php/player_helpers_v1.00.php", true);
+                oReq.onload = function (oEvent) {
+                    if (oReq.status == 200) {
 
-                try {
-                    const response = await get("https://ngatesystems.com/beagairbheag/php/player_helpers_v1.10.php", fData)
+                        var response = oReq.responseText;
+                        if (response.indexOf("%failed%") != -1) {
+                            alert(response);
+                        } else {
 
-                    if (response.indexOf("%failed%") != -1) {
-                        alert(response);
-                    } else {
+                            // extracting the text with javascript turned out to be no slower than using php
+                            // and generally faster - hard to see why
 
-                        // extracting the text with javascript turned out to be no slower than using php
-                        // and generally faster - hard to see why
+                            transcriptSource = autoEditText(response);
+                            hideWaitIcon();
 
-                        transcriptSource = autoEditText(response);
-                        hideWaitIcon();
+                            setActivityPanelToString("<strong>" + textHeading + "</strong>" + transcriptSource);
+                            activitypanel.ondblclick = amFaclairBeagSearch; // add double click to drive the dictionary lookup
 
-                        setActivityPanelToString("<strong>" + textHeading + "</strong>" + transcriptSource);
-                        activitypanel.ondblclick = amFaclairBeagSearch; // add double click to drive the dictionary lookup
+                            // tuck a copy away in the local Texts indexedDB database for use by "search" button
 
-                        // tuck a copy away in the local Texts indexedDB database for use by "search" button
-
-                        textObject = { 'textkey': textKey, "text": transcriptSource };
-                        saveTextInLocalDb(textObject);
+                            textObject = { 'textkey': textKey, "text": transcriptSource };
+                            saveTextInLocalDb(textObject);
+                        }
                     }
-                }
-                catch (err) {
-                    alert("Failed! " + err);
-                    return;
-                }
-
+                };
+                oReq.send(oData);
             } else {
 
                 // if searchString is defined, highlight occurrences in retrievedText. This is slightly tedious as we're
@@ -1189,8 +1189,7 @@
                     if (e.toString().indexOf(textAlreadyExists) != -1) {
                         return;
                     } else {
-                        alert(e);
-                        return;
+                        console.error(e);
                     }
                 }
             }
@@ -1239,59 +1238,63 @@
 
         }
 
-        async function buildScreenForChangedEpisode() {
+        function buildScreenForChangedEpisode() {
 
             // get the download filename and duration etc for the currently-selected programme
 
-            var fData = new FormData(document.getElementById("dummyform"));
-            fData.append("helper_type", "get_programme_data");
-            fData.append("series_num", currentSeriesNum);
-            fData.append("episode_nam", currentEpisodeNam);
+            var form = document.forms.namedItem("dummyform");
+            var oData = new FormData(form);
+            oData.append("helper_type", "get_programme_data");
+            oData.append("series_num", currentSeriesNum);
+            oData.append("episode_nam", currentEpisodeNam);
+            var oReq = new XMLHttpRequest();
+            oReq.open("POST", "https://ngatesystems.com/beagairbheag/php/player_helpers_v1.00.php", true);
+            oReq.onload = function (oEvent) {
+                if (oReq.status == 200) {
 
-            try {
-                const response = await get("https://ngatesystems.com/beagairbheag/php/player_helpers_v1.10.php", fData)
-
-                if (response.indexOf("%failed%") != -1) {
-                    alert(response);
-                } else {
-
-                    JSONObject = JSON.parse(response);
-                    currentEpisodeFinishTime = JSONObject.currentEpisodeFinishTime;
-                    currentFirstOnDate = JSONObject.currentFirstOnDate;
-                    currentLearnerOfTheWeek = JSONObject.currentLearnerOfTheWeek;
-                    currentBBCProgrammeUrl = JSONObject.currentBBCProgrammeUrl;
-                    currentSplashScreenFilename = JSONObject.currentSplashScreenFilename;
-                    currentSplashScreenTitle = JSONObject.currentSplashScreenTitle;
-                    currentBBCDownloadFilename = JSONObject.audiofilename;
-
-                    localStorage.setItem('lastSeriesNum', currentSeriesNum);
-                    localStorage.setItem('lastEpisodeNam', currentEpisodeNam);
-                    localStorage.setItem('lastEpisodeFinishTime', currentEpisodeFinishTime);
-                    localStorage.setItem('lastFirstOnDate', currentFirstOnDate);
-                    localStorage.setItem('lastLearnerOfTheWeek', currentLearnerOfTheWeek);
-                    localStorage.setItem('lastBBCProgrammeUrl', currentBBCProgrammeUrl);
-                    localStorage.setItem('lastSplashScreenFilename', currentSplashScreenFilename);
-                    localStorage.setItem('lastSplashScreenTitle', currentSplashScreenTitle);
-                    localStorage.setItem('lastBBCDownloadFilename', currentBBCDownloadFilename);
-
-                    buildScreenForCurrentEpisode();
-
-                    if (editNotePanelDisplayRequired) {
-                        displayEditNotePanel(currentNoteId);
-                        editNotePanelDisplayRequired = false
+                    var response = oReq.responseText;
+                    if (response.indexOf("%failed%") != -1) {
+                        alert(response);
                     } else {
-                        music.addEventListener("timeupdate", timeUpdate);
-                        music.src = JSONObject.audiofilename + ".mp3";
-                        music.currentTime = 0;
-                        pbutton.style.backgroundImage = "url('https://ngatesystems.com/beagairbheag/img/play.png')";
+
+                        var xmlDoc = oReq.responseXML;
+                        var JSONString = xmlDoc.getElementsByTagName("returns")[0].childNodes[0].nodeValue;
+                        var JSONObject = JSON.parse(JSONString);
+
+                        currentEpisodeFinishTime = JSONObject.currentEpisodeFinishTime;
+                        currentFirstOnDate = JSONObject.currentFirstOnDate;
+                        currentLearnerOfTheWeek = JSONObject.currentLearnerOfTheWeek;
+                        currentBBCProgrammeUrl = JSONObject.currentBBCProgrammeUrl;
+                        currentSplashScreenFilename = JSONObject.currentSplashScreenFilename;
+                        currentSplashScreenTitle = JSONObject.currentSplashScreenTitle;
+                        currentBBCDownloadFilename = JSONObject.audiofilename;
+
+                        localStorage.setItem('lastSeriesNum', currentSeriesNum);
+                        localStorage.setItem('lastEpisodeNam', currentEpisodeNam);
+                        localStorage.setItem('lastEpisodeFinishTime', currentEpisodeFinishTime);
+                        localStorage.setItem('lastFirstOnDate', currentFirstOnDate);
+                        localStorage.setItem('lastLearnerOfTheWeek', currentLearnerOfTheWeek);
+                        localStorage.setItem('lastBBCProgrammeUrl', currentBBCProgrammeUrl);
+                        localStorage.setItem('lastSplashScreenFilename', currentSplashScreenFilename);
+                        localStorage.setItem('lastSplashScreenTitle', currentSplashScreenTitle);
+                        localStorage.setItem('lastBBCDownloadFilename', currentBBCDownloadFilename);
+
+                        buildScreenForCurrentEpisode();
+
+                        if (editNotePanelDisplayRequired) {
+                            displayEditNotePanel(currentNoteId);
+                            editNotePanelDisplayRequired = false
+                        } else {
+                            music.addEventListener("timeupdate", timeUpdate);
+                            music.src = JSONObject.audiofilename + ".mp3";
+                            music.currentTime = 0;
+                            pbutton.style.backgroundImage = "url('https://ngatesystems.com/beagairbheag/img/play.png')";
+                        }
+
                     }
                 }
-            }
-            catch (err) {
-                alert("Failed! " + err);
-                return;
-            }
-
+            };
+            oReq.send(oData);
         }
 
         function displayButtonDiv(buttondivid) {
@@ -1504,7 +1507,6 @@
                     ]);
                 } catch (e) {
                     alert(e);
-                    return;
                 }
             }
 
@@ -1586,16 +1588,19 @@
 
             // and now build the fileString and send it off to the server
 
-            var fData = new FormData(document.getElementById("dummyform"));
-            fData.append("helper_type", "backup_data_stores");
-            fData.append("file_string", jotter + "%%%$$$" + notesJson);
+            var form = document.forms.namedItem("dummyform");
+            var oData = new FormData(form);
+            oData.append("helper_type", "backup_data_stores");
+            oData.append("file_string", jotter + "%%%$$$" + notesJson);
+            var oReq = new XMLHttpRequest();
+            oReq.open("POST", "https://ngatesystems.com/beagairbheag/php/player_helpers_v1.00.php", true);
+            oReq.onload = function (oEvent) {
+                if (oReq.status == 200) {
 
-            try {
-                const response = await get("https://ngatesystems.com/beagairbheag/php/player_helpers_v1.10.php", fData)
-
-                if (response.indexOf("%failed%") != -1) {
-                    alert(response);
-                } else {
+                    var response = oReq.responseText;
+                    if (response.indexOf("%failed%") != -1) {
+                        alert(response);
+                    }
 
                     // response contains the unique filename generated for this backup. Edit the
                     // backupdownloadlink <a> element to request its download
@@ -1605,28 +1610,23 @@
                     document.getElementById('backupdownloadlink').setAttribute('href', 'https://ngatesystems.com/beagairbheag/php/download_babbackup.php?transitfilename=' + transitFilename);
                     document.getElementById('backupdownloadlink').click();
                 }
-            }
-            catch (err) {
-                alert("Failed! " + err);
-                return;
-            }
-
+            };
+            oReq.send(oData);
         }
 
         var restoreInProgress;
         var restoreId;
-        async function uploadBackupFile() {
+        function uploadBackupFile() {
 
             // The user's jotter and note data sources are held in a local file. But we can't
-            // read this - all a browser can do with a local file is upload it to a server. If
-            // we do this, however, and store the file on the server we can then use an XMLHTTP 
-            // request to read the file and "echo" the content back to the browser. But there are  
-            // two snags. 
-            // The first snag is easy to fix - because there's the lossibility that 
+            // read this - all a browser can do with a local file is upload it to the server.
+            // If we do this and store the file on the server we can then use an XMLHTTP request
+            // to read the file and "echo" the content back to the browser. But there are two 
+            // snags. The first of these is easy to fix - because there's the lossibility that 
             // several users might be trying to do this at the same time, we have to give each
             // one a unique filename. So, before we upload the file we use the server to get
-            // a unique number to guide the restore. So far so good...
-            // The second problem is a bit more tricky. it's not possible to collect 
+            // a unique number for the restore and return it to use before we start. So far
+            // so good. The second problem is a bit more tricky. it's not possible to collect 
             // a filename from a /local/ execution like babindex.html and expect it to
             // be available in $_FILES when a /server-based/ PHP program goes looking for it - we
             // have to do this from a web-sourced page. We get round this by launch the file-upload
@@ -1636,15 +1636,18 @@
 
             // first of all get the unique number
 
-            var fData = new FormData(document.getElementById("dummyform"));
-            fData.append("helper_type", "increment_restore_count");
+            var form = document.forms.namedItem("dummyform");
+            var oData = new FormData(form);
+            oData.append("helper_type", "increment_download_count");
+            var oReq = new XMLHttpRequest();
+            oReq.open("POST", "https://ngatesystems.com/beagairbheag/php/player_helpers_v1.00.php", true);
+            oReq.onload = function (oEvent) {
+                if (oReq.status == 200) {
 
-            try {
-                const response = await get("https://ngatesystems.com/beagairbheag/php/player_helpers_v1.10.php", fData)
-
-                if (response.indexOf("%failed%") != -1) {
-                    alert(response);
-                } else {
+                    var response = oReq.responseText;
+                    if (response.indexOf("%failed%") != -1) {
+                        alert(response);
+                    }
 
                     var transitFilename = "babbackup" + response + ".txt";
 
@@ -1662,36 +1665,35 @@
                     // so that we can extract the jsons and rebuild the datastore. this is accomplished by inviting the
                     // user to "click outside this popup to finalize the restore" - this message is displyed when they
                     // click the restore button. Finally, clicking outside the popup fires a function that was created
-                    // by babindex.html (in displayPopupWindow(url)) when the popup was opened. This calls the 
-                    // restoreDataStores function in babindex.html to complete the process
-                }
-            }
-            catch (err) {
-                alert("Failed! " + err);
-                return;
-            }
+                    // by babindex.html when the popup was opened. This calls restoreDataStores function in babindex.html
+                    // to complete the process
 
+                }
+            };
+            oReq.send(oData);
         }
 
         async function restoreDataStores() {
 
             // use the restoreId global variable to tell player_helpers where to find
-            // the unique file name allocated for this restore session. Supply this as
+            // the unique file name allocated for this restore session. Suuply this as
             // a GET parameter to maintain consistency with other elements of the 
             // procedure
 
             var transitFilename = "babbackup" + restoreId + ".txt";
 
-            var fData = new FormData(document.getElementById("dummyform"));
-            fData.append("helper_type", "restore_data_stores");
-            fData.append("transitfilename", transitFilename);
+            var form = document.forms.namedItem("dummyform");
+            var oData = new FormData(form);
+            oData.append("helper_type", "restore_data_stores");
+            var oReq = new XMLHttpRequest();
+            oReq.open("POST", "https://ngatesystems.com/beagairbheag/php/player_helpers_v1.00.php?transitfilename=" + transitFilename, true);
+            oReq.onload = async function (oEvent) {
+                if (oReq.status == 200) {
 
-            try {
-                const response = await get("https://ngatesystems.com/beagairbheag/php/player_helpers_v1.10.php", fData)
-
-                if (response.indexOf("%failed%") != -1) {
-                    alert(response);
-                } else {
+                    var response = oReq.responseText;
+                    if (response.indexOf("%failed%") != -1) {
+                        alert(response);
+                    }
 
                     // split the response into its jotter and notes_json elements
 
@@ -1716,7 +1718,6 @@
                             ]);
                         } catch (e) {
                             alert(e);
-                            return;
                         }
                     }
 
@@ -1746,19 +1747,15 @@
                         await tx.store.put(noteObject);
                     }
 
-                    buildNoteline(currentSeriesNum, currentEpisodeNam, scaleFactor, scaleCorrectionForNote)
-
                     // now display an "OK" message in activitypanel and rebuild the noteline
 
-                    var message = "<p style='margin-top:3vh; text-align: center; color: blue'><span>Restore completed successfully.</span></p>";
+                    var message = "<p style='margin-top:3vh; text-align: center; color: blue'><span>Restore completed successfully</span></p>";
                     setActivityPanelToString(message);
 
+                    buildNoteline(seriesNum, episodeNam, scaleFactor, scaleCorrectionForNote)
                 }
-            }
-            catch (err) {
-                alert("Failed! " + err);
-                return;
-            }
+            };
+            oReq.send(oData);
         }
 
         function displayColinMarkWindow() {
@@ -1767,42 +1764,6 @@
             var targetUrl = "https://ngatesystems.com/beagairbheag/colinmark/translationmasterclasses.html?ver=" + currentTime;
             displayPopupWindow(targetUrl);
 
-        }
-
-        ///// Utility script //////////
-
-        function get(url, params) {
-
-            // 'Promisified' version of basic POST, asynchronous XMLHTTP call courtesy of Jake Archibald
-            // see - https://web.dev/promises/#whats-all-the-fuss-about
-
-            return new Promise(function (resolve, reject) {
-                // Do the usual XHR stuff
-                var req = new XMLHttpRequest();
-                req.open('POST', url);
-
-                req.onload = function () {
-                    // This is called even on 404 etc
-                    // so check the status
-                    if (req.status == 200) {
-                        // Resolve the promise with the response text
-                        resolve(req.response);
-                    }
-                    else {
-                        // Otherwise reject with the status text
-                        // which will hopefully be a meaningful error
-                        reject(Error(req.statusText));
-                    }
-                };
-
-                // Handle network errors
-                req.onerror = function () {
-                    reject(Error("Network Error"));
-                };
-
-                // Make the request
-                req.send(params);
-            });
         }
 
         function displayPopupWindow(url) {
