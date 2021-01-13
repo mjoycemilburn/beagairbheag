@@ -29,8 +29,8 @@ require('../includes/beagairbheag_functions.php');
 // 'get_programme_data'                 -   return the filename for given series_num and episode_na
 //
 // 'backup_data_stores'                 -   increment the backup_count field and use this to generate
-//                                          a unique "transit" filename on the server in which to store 
-//                                          the supplied jsons representing the jotter and notes datastores. 
+//                                          a unique "transit" filename on the server in which to store
+//                                          the supplied jsons representing the jotter and notes datastores.
 //                                          Echo the  new backup_count value back to babindex.html
 //
 // 'upload_backup_file'                 -   upload the file supplied by $_FILES to the location specified
@@ -46,7 +46,7 @@ require('../includes/beagairbheag_functions.php');
 // 'increment_download_count'           -   add 1 to the database field that counts the number of times
 //                                          that bab has been downloaded
 //
-// 'get_system_data'                    -   get the version number of the latest releases of bab 
+// 'get_system_data'                    -   get the version number of the latest releases of bab
 
 $page_title = 'player_helpers';
 
@@ -190,10 +190,9 @@ if ($helper_type == "build_textline") {
 if ($helper_type == "get_transcript_source") {
     $url = $_POST['url'];
 
-    $raw_contents = file_get_contents($url); 
+    $raw_contents = file_get_contents($url);
     
     echo $raw_contents;
-
 }
 
 //////////////////////////////////////////  get_programme_data ////////////////////////////////////////
@@ -231,7 +230,6 @@ if ($helper_type === "get_programme_data") {
 //////////////////////////////////////////  get_text_types_data ////////////////////////////////////////
 
 if ($helper_type === "get_text_types_data") {
-
     $sql = "SELECT * FROM text_types";
 
     $result = sql_result_for_location($sql, 5);
@@ -353,10 +351,9 @@ if ($helper_type === "restore_data_stores") {
 
     unlink($transit_filename);
 }
+//////////////////////////////////////////  increment_view_count ////////////////////////////////////////
 
-//////////////////////////////////////////  increment_download_count ////////////////////////////////////////
-
-if ($helper_type === "increment_download_count") {
+if ($helper_type === "increment_view_count") {
     $result = sql_result_for_location('START TRANSACTION', 14);
 
     $sql = "SELECT * FROM system
@@ -364,12 +361,12 @@ if ($helper_type === "increment_download_count") {
 
     $result = sql_result_for_location($sql, 15);
     $row = mysqli_fetch_array($result);
-    $download_count = $row['download_count'];
+    $view_count = $row['view_count'];
 
-    $download_count++ % 100000;
+    $view_count++ % 100000;
 
     $sql = "UPDATE system SET
-                download_count = '$download_count'
+                view_count = '$view_count'
             WHERE 
                 system_key = 'bab';";
 
@@ -380,13 +377,39 @@ if ($helper_type === "increment_download_count") {
     echo $download_count;
 }
 
+//////////////////////////////////////////  increment_download_count ////////////////////////////////////////
+
+if ($helper_type === "increment_download_count") {
+    $result = sql_result_for_location('START TRANSACTION', 18);
+
+    $sql = "SELECT * FROM system
+            WHERE system_key = 'bab';";
+
+    $result = sql_result_for_location($sql, 19);
+    $row = mysqli_fetch_array($result);
+    $download_count = $row['download_count'];
+
+    $download_count++ % 100000;
+
+    $sql = "UPDATE system SET
+                download_count = '$download_count'
+            WHERE 
+                system_key = 'bab';";
+
+    $result = sql_result_for_location($sql, 20);
+
+    $result = sql_result_for_location('COMMIT', 21);
+
+    echo $download_count;
+}
+
 //////////////////////////////////////////  get_system_data ////////////////////////////////////////
 
 if ($helper_type === "get_system_data") {
     $sql = "SELECT * FROM system
             WHERE system_key = 'bab';";
 
-    $result = sql_result_for_location($sql, 18);
+    $result = sql_result_for_location($sql, 22);
     $row = mysqli_fetch_array($result);
 
     $version_number = $row['version_number'];

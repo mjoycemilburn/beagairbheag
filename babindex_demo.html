@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en-GB">
-
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
@@ -368,7 +367,7 @@
 
     <script>
 
-        var currentSystemVersionNumber = "1.20";
+        var currentSystemVersionNumber = "1.10";
         var latestSystemVersionNumber;
         var cryptography; // text for cryptography, about and hints will be served from central sources
         var about;
@@ -2136,7 +2135,7 @@
             postTime = postTime - 1.0;
             biteStartTime = postTime - 5.0;
             biteStartTime = Math.max(0, biteStartTime);
-            biteFinishTime = postTime;
+            biteFinishTime = postTime ;
             music.currentTime = biteStartTime;
             music.ontimeupdate = function () {
                 restrictSoundbite();
@@ -2217,6 +2216,184 @@
         }
 
         ///// Demo Stuff //////////
+
+    </script>
+
+    <div id="demobanner" style="position: absolute; top: 0px; left: 0px; display: block; width: 100%; height: 100%;">
+        <img style="height: 100%; width: 100%;" src="https:ngatesystems.com/beagairbheag/demo/demobanner.jpg"
+            onclick="document.getElementById('demobanner').style.display = 'none'; playDemoPhase1();">
+    </div>
+
+    <script>
+
+        async function playDemoPhase1() {
+
+            // show the companion for 2 sec
+            await wait(function () { }, 2);
+
+            // take over the activity panel 
+            var printString = "\
+            Welcome to 'The BaB Companion'!.<br><br> You're looking at the Companion\
+            running in Google Chrome. The rinky-dink 'tickertape' arrangement delivering this commentary is just something\
+            I cooked up to counter the fact\
+            that I'm better at typing than talking! It has temporarily appropriated the 'activity panel'\
+            where most of the Companion's interaction takes place. <br><br>\
+            As you can see, the Companion's main feature is the central grey bar\
+            of its 'audio line'. The round, black 'playhead' indicates the current audio position.<br><br>\
+            The Companion is currently focussed on Episode 1\
+            of BaB Series 12. Let's click the 'play' button in the control panel\
+            immediately above the audio line and start playback of this episode.";
+            for (var i = 0; i <= printString.length; i++) {
+                await typeComment(printString, i);
+            }
+
+            // set a click on the logo to start the second bit of the demo when you've finished demonstrating the
+            // playline
+
+            logo.setAttribute("onclick", "playDemoPhase1a();");
+
+        }
+
+        async function playDemoPhase1a() {
+
+            var printString = "\
+            We can move the 'playhead' to a new position in a variety of different ways - by clicking on the playline, \
+            dragging the playhead or pointing to it and twiddling the mouse scroll wheel.";
+            for (var i = 0; i <= printString.length; i++) {
+                await typeComment(printString, i);
+            }
+
+            // set a click on the logo to start the second bit of the demo when you've finished demonstrating the
+            // playline
+
+            logo.setAttribute("onclick", "playDemoPhase2();");
+
+        }
+
+        async function playDemoPhase2() {
+
+            var printString = "\
+            When you hit a section of the audio that you can't quite follow, you'll probably want to replay it\
+            repeatedly while you work out what is going on.<br><br>\
+            You <b>could</b> do this by scrolling back on the playhead but it's easier to use the special tool\
+            that the Companion provides precisely for this purpose.<br><br>\
+            Click the ? button on the audio control panel and you'll find that the audio replays the last\
+            5 seconds and then stops to give you time to think. Click again and the process is repeated.";
+
+            for (var i = 0; i <= printString.length; i++) {
+                await typeComment(printString, i);
+            }
+
+
+            // set a click on the logo to start the third bit of the demo when you've finished demonstrating the
+            //? button
+
+            logo.setAttribute("onclick", "playDemoPhase3();");
+
+        }
+
+        async function playDemoPhase3() {
+
+            var printString = "\
+            When you do, finally, work out what's going on, you may want to make a note to remind yourself of your\
+            insight next time you play this episode. Cick the ! button on\
+            the audio control panel and you'll see a 'note-entry' form appear in the central activity panel. Use\
+            the 'nudge' controls to position the 5-second 'sound-bite' that will accompany the note and enter some\
+            interpretative details. <br><br>\
+            When you finally 'save' the note you'll find that a black ! character appears  above the audio line\
+            at the note's position. Your note is now stored permanently in browser storage and its ! indicator will\
+            be re-displayed whenever you revisit this episode. If you click on it you'll hear the\
+            note's sound-bite and see your note-text again in the activity panel.";
+
+            for (var i = 0; i <= printString.length; i++) {
+                await typeComment(printString, i);
+            }
+
+            // reset the click on the logo so you can demnstrate the query facility
+
+            logo.setAttribute("onclick", "playDemoPhase4();");
+        }
+
+        async function playDemoPhase4() {
+
+            var printString = "\
+            If you are temporarily defeated by a bit of audio, you may find it useful to save a note that\
+            shows that the section is problematic and which stands out in some way from\
+            note-marks that are just there as reminders. <br><br>\
+            The Companion enables you to do this by providing a facility to save notes on problem sections as 'queries'\
+            rather than 'notes'. Queries are indicated on the noteline as red ? characters rather than black ! marks. <br><br>\
+            When you do finally sort the problem out - the penny usually drops eventually - you can update\
+            the text and resave it as a note, thus changing its indicator back to a ! mark.";
+
+            for (var i = 0; i <= printString.length; i++) {
+                await typeComment(printString, i);
+            }
+
+            // reset the click on the logo so you can demonstrate the text facility
+
+            var onclickLink = "playDemoPhase5();";
+            logo.setAttribute("onclick", onclickLink);
+        }
+
+        async function playDemoPhase5() {
+
+            var printString = "\
+            The coloured blocks below the play-line indicate the location of the transcripts that accompany\
+            every BaB episode. Tooltips will appear when you mouse-over the blocks to tell you what they contain. Clicking\
+            on a block will cause its content to be displayed in the activity panel. Clicking on a word in the\
+            transcript will fire up the currently-selected dictionary to provide a  definition.";
+
+            for (var i = 0; i <= printString.length; i++) {
+                await typeComment(printString, i);
+            }
+
+            // reset the click on the logo so you can demonstrate the dictionary facility
+
+            var onclickLink = "playDemoPhase6();";
+            logo.setAttribute("onclick", onclickLink);
+        }
+
+        async function playDemoPhase6() {
+
+            var printString = "\
+            There are plenty more tricks up the Companion's sleeve, but you've probably had enough for now. <br><br>\
+            For more information check out the 'readme' file on the Companion's github repository page\
+            at https://github.com/mjoycemilburn/beagairbheag. <br><br>Enjoy!";
+
+            for (var i = 0; i <= printString.length; i++) {
+                await typeComment(printString, i);
+            }
+
+        }
+
+        function wait(myFunction, waitSeconds) {
+            return new Promise(function (resolve, reject) {
+                setTimeout(function () {
+                    myFunction();
+                    resolve();
+                }, waitSeconds * 1000);
+
+            });
+        }
+
+        function typeComment(textString, n) {
+            // set innerHTML of element "test" to the first n chars of textString]
+            return new Promise(function (resolve, reject) {
+                setTimeout(function () {
+                    activitypanel.innerHTML = textString.substring(0, n);
+                    resolve();
+                }, 20);
+            });
+        }
+
+    </script>
+
+
+
+
+
+
+
 
     </script>
 </body>
