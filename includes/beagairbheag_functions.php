@@ -5,7 +5,8 @@ function connect_to_database()
     global $con, $url_root;
 
     if (($_SERVER['REMOTE_ADDR'] == '127.0.0.1' or $_SERVER['REMOTE_ADDR'] == '::1')) {
-        $url_root = '';
+        $url_root = '../../';
+
     } else {
         $current_directory_root = $_SERVER['DOCUMENT_ROOT']; // one level above current directory
         // remove everything after and including "public_html"
